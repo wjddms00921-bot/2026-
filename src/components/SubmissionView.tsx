@@ -50,9 +50,9 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
 
   const studentTitle = formatStudentFullTitle(
     submission.grade,
+    submission.studentName,
     submission.classNum,
-    submission.studentNum,
-    submission.studentName
+    submission.studentNum
   );
 
   const gradeDisplay = formatGradeText(submission.grade);

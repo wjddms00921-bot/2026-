@@ -103,33 +103,23 @@ export function generateSingleFileHtml(): string {
       </div>
 
       <form id="authForm" class="space-y-4" onsubmit="handleAuthSubmit(event)">
-        <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">학년/구분 <span class="text-rose-500">*</span></label>
-            <select id="gradeInput" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold">
-              <option value="">선택</option>
-              <option value="유치원">유치원</option>
-              <option value="1">1학년</option>
-              <option value="2">2학년</option>
-              <option value="3">3학년</option>
-              <option value="4">4학년</option>
-              <option value="5">5학년</option>
-              <option value="6">6학년</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">반 <span class="text-rose-500">*</span></label>
-            <input type="number" id="classInput" min="1" max="20" placeholder="예: 2" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">번호 <span class="text-rose-500">*</span></label>
-            <input type="number" id="numInput" min="1" max="50" placeholder="예: 15" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none">
-          </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">학년/구분 <span class="text-rose-500">*</span></label>
+          <select id="gradeInput" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold cursor-pointer">
+            <option value="">학년 또는 유치원을 선택해 주세요</option>
+            <option value="유치원">유치원</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+            <option value="4">4학년</option>
+            <option value="5">5학년</option>
+            <option value="6">6학년</option>
+          </select>
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">학생 이름 <span class="text-rose-500">*</span></label>
-          <input type="text" id="nameInput" placeholder="예: 김옥동" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none">
+          <input type="text" id="nameInput" placeholder="예: 김민서" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none">
         </div>
 
         <div>
@@ -400,26 +390,24 @@ export function generateSingleFileHtml(): string {
     }
 
     // 2. 학생 고유 식별키 생성
-    function getStudentKey(grade, classNum, num, name) {
-      return 'g' + grade + '_c' + classNum + '_n' + num + '_' + name.trim();
+    function getStudentKey(grade, name) {
+      return 'g' + grade + '_' + name.trim();
     }
 
     // 3. 로그인 및 인증 처리
     function handleAuthSubmit(event) {
       event.preventDefault();
       const grade = document.getElementById('gradeInput').value;
-      const classNum = document.getElementById('classInput').value;
-      const num = document.getElementById('numInput').value;
       const name = document.getElementById('nameInput').value.trim();
       const password = document.getElementById('pwInput').value.trim();
 
-      if (!grade || !classNum || !num || !name || password.length !== 4) {
-        alert('모든 필수 항목과 4자리 비밀번호를 올바르게 입력해 주세요.');
+      if (!grade || !name || password.length !== 4) {
+        alert('학년(유치원), 학생 이름, 4자리 비밀번호를 올바르게 입력해 주세요.');
         return;
       }
 
-      const studentKey = getStudentKey(grade, classNum, num, name);
-      currentUser = { grade, classNum, num, name, password, studentKey };
+      const studentKey = getStudentKey(grade, name);
+      currentUser = { grade, name, password, studentKey };
 
       loadSubmissionForUser(studentKey, password);
     }
@@ -458,7 +446,7 @@ export function generateSingleFileHtml(): string {
 
       document.getElementById('authSection').classList.add('hidden');
       document.getElementById('userHeader').classList.remove('hidden');
-      document.getElementById('userHeaderInfo').textContent = formatGradeDisplay(currentUser.grade) + ' ' + currentUser.classNum + '반 ' + currentUser.num + '번 ' + currentUser.name + ' 가정';
+      document.getElementById('userHeaderInfo').textContent = formatGradeDisplay(currentUser.grade) + ' ' + currentUser.name + ' 가정';
     }
 
     function switchSubmittedTab(tab) {
@@ -584,8 +572,6 @@ export function generateSingleFileHtml(): string {
       const payload = {
         studentKey: currentUser.studentKey,
         grade: currentUser.grade,
-        classNum: currentUser.classNum,
-        num: currentUser.num,
         name: currentUser.name,
         password: currentUser.password,
         roleCategory: roleTitle,

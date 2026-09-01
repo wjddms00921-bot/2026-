@@ -8,8 +8,6 @@ interface AuthCardProps {
 
 export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
   const [grade, setGrade] = useState<string>('');
-  const [classNum, setClassNum] = useState<string>('');
-  const [studentNum, setStudentNum] = useState<string>('');
   const [studentName, setStudentName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -18,8 +16,8 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
     e.preventDefault();
     setError(null);
 
-    if (!grade || !classNum || !studentNum || !studentName.trim()) {
-      setError('학년(유치원), 반, 번호, 학생 이름을 모두 입력해 주세요.');
+    if (!grade || !studentName.trim()) {
+      setError('학년(유치원)과 학생 이름을 입력해 주세요.');
       return;
     }
 
@@ -30,8 +28,6 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
 
     onLogin({
       grade: grade === '유치원' ? '유치원' : Number(grade),
-      classNum: Number(classNum),
-      studentNum: Number(studentNum),
       studentName: studentName.trim(),
       password,
     });
@@ -39,14 +35,10 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
 
   const handleQuickDemo = (
     demoGrade: string | number,
-    demoClass: number,
-    demoNum: number,
     demoName: string,
     demoPw: string
   ) => {
     setGrade(String(demoGrade));
-    setClassNum(String(demoClass));
-    setStudentNum(String(demoNum));
     setStudentName(demoName);
     setPassword(demoPw);
     setError(null);
@@ -61,7 +53,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">가정별 로그인 &amp; 참여</h2>
         </div>
-        <span className="text-xs text-slate-400 font-medium">유치원 ~ 6학년 자녀 학적 정보로 간편 로그인</span>
+        <span className="text-xs text-slate-400 font-medium">유치원 ~ 6학년 자녀 학년과 이름으로 간편 로그인</span>
       </div>
 
       {error && (
@@ -72,60 +64,26 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Grade / Class / Number */}
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
-              학년/과정 <span className="text-rose-500">*</span>
-            </label>
-            <select
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              required
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-2.5 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
-            >
-              <option value="">선택</option>
-              <option value="유치원">유치원</option>
-              <option value="1">1학년</option>
-              <option value="2">2학년</option>
-              <option value="3">3학년</option>
-              <option value="4">4학년</option>
-              <option value="5">5학년</option>
-              <option value="6">6학년</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
-              반 <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="20"
-              placeholder="예: 2"
-              value={classNum}
-              onChange={(e) => setClassNum(e.target.value)}
-              required
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-3 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
-              번호 <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="50"
-              placeholder="예: 14"
-              value={studentNum}
-              onChange={(e) => setStudentNum(e.target.value)}
-              required
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-3 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
-            />
-          </div>
+        {/* Grade Selection */}
+        <div>
+          <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
+            학년/구분 <span className="text-rose-500">*</span>
+          </label>
+          <select
+            value={grade}
+            onChange={(e) => setGrade(e.target.value)}
+            required
+            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all cursor-pointer"
+          >
+            <option value="">학년 또는 유치원을 선택해 주세요</option>
+            <option value="유치원">유치원</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+            <option value="4">4학년</option>
+            <option value="5">5학년</option>
+            <option value="6">6학년</option>
+          </select>
         </div>
 
         {/* Student Name */}
@@ -187,31 +145,31 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => handleQuickDemo('유치원', 1, 3, '이사랑', '1234')}
+            onClick={() => handleQuickDemo('유치원', '이사랑', '1234')}
             className="text-xs px-3.5 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold border border-emerald-300 transition-colors flex items-center gap-1"
           >
-            <span>🐣 유치원 1반 3번 이사랑 (제출완료)</span>
+            <span>🐣 유치원 이사랑 (제출완료)</span>
           </button>
           <button
             type="button"
-            onClick={() => handleQuickDemo(3, 2, 14, '김민서', '1234')}
+            onClick={() => handleQuickDemo(3, '김민서', '1234')}
             className="text-xs px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border border-amber-300 transition-colors flex items-center gap-1"
           >
-            <span>✨ 3학년 2반 14번 김민서 (제출완료)</span>
+            <span>✨ 3학년 김민서 (제출완료)</span>
           </button>
           <button
             type="button"
-            onClick={() => handleQuickDemo(5, 1, 7, '박준우', '1234')}
+            onClick={() => handleQuickDemo(5, '박준우', '1234')}
             className="text-xs px-3.5 py-1.5 rounded-xl bg-orange-100 hover:bg-orange-200 text-orange-900 font-bold border border-orange-300 transition-colors flex items-center gap-1"
           >
-            <span>✨ 5학년 1반 7번 박준우 (제출완료)</span>
+            <span>✨ 5학년 박준우 (제출완료)</span>
           </button>
           <button
             type="button"
-            onClick={() => handleQuickDemo(2, 3, 5, '이서연', '5678')}
+            onClick={() => handleQuickDemo(2, '이서연', '5678')}
             className="text-xs px-3.5 py-1.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-900 font-bold border border-blue-300 transition-colors flex items-center gap-1"
           >
-            <span>📝 2학년 3반 5번 이서연 (신규 작성)</span>
+            <span>📝 2학년 이서연 (신규 작성)</span>
           </button>
         </div>
       </div>

@@ -1,18 +1,18 @@
 export interface StudentAuth {
   grade: string | number; // '유치원' | 1 | 2 | 3 | 4 | 5 | 6
-  classNum: string | number;
-  studentNum: string | number;
   studentName: string;
   password: string; // 4-digit number
+  classNum?: string | number;
+  studentNum?: string | number;
 }
 
 export interface MissionSubmission {
   id: string;
-  studentKey: string; // e.g., 'g유치원_c1_n3_이사랑' or 'g3_c2_n14_김민서'
+  studentKey: string; // e.g., 'g유치원_이사랑' or 'g3_김민서'
   grade: string | number;
-  classNum: string | number;
-  studentNum: string | number;
   studentName: string;
+  classNum?: string | number;
+  studentNum?: string | number;
   passwordHash?: string;
   roleSwapCategory: string; // 자유 작성 역할 바꾸기 제목/요약
   roleSwapDetail: string;   // 자유 작성 역할 바꾸기 세부 내용
@@ -40,10 +40,16 @@ export function formatGradeText(grade: string | number): string {
 
 export function formatStudentFullTitle(
   grade: string | number,
-  classNum: string | number,
-  studentNum: string | number,
-  studentName: string
+  studentName: string,
+  classNum?: string | number,
+  studentNum?: string | number
 ): string {
   const gText = formatGradeText(grade);
-  return `${gText} ${classNum}반 ${studentNum}번 ${studentName}`;
+  if (classNum && studentNum) {
+    return `${gText} ${classNum}반 ${studentNum}번 ${studentName}`;
+  }
+  if (classNum) {
+    return `${gText} ${classNum}반 ${studentName}`;
+  }
+  return `${gText} ${studentName}`;
 }

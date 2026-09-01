@@ -40,8 +40,6 @@ export default function App() {
       setCurrentUser(savedUser);
       const studentKey = makeStudentKey(
         savedUser.grade,
-        savedUser.classNum,
-        savedUser.studentNum,
         savedUser.studentName
       );
       const sub = list.find((s) => s.studentKey === studentKey);
@@ -54,7 +52,7 @@ export default function App() {
     setCurrentUser(auth);
     setStoredUser(auth);
 
-    const studentKey = makeStudentKey(auth.grade, auth.classNum, auth.studentNum, auth.studentName);
+    const studentKey = makeStudentKey(auth.grade, auth.studentName);
     const existing = findSubmissionByStudentKey(studentKey);
 
     if (existing) {
@@ -107,7 +105,7 @@ export default function App() {
               <div>
                 <div className="text-xs text-slate-500 font-bold">현재 접속 중인 가정</div>
                 <div className="text-sm sm:text-base font-black text-slate-900">
-                  {formatStudentFullTitle(currentUser.grade, currentUser.classNum, currentUser.studentNum, currentUser.studentName)} 가정
+                  {formatStudentFullTitle(currentUser.grade, currentUser.studentName)} 가정
                 </div>
               </div>
             </div>

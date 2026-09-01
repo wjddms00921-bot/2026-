@@ -5,20 +5,16 @@ const STORAGE_KEY_CURRENT_USER = 'okdong_switch_on_current_user';
 
 export function makeStudentKey(
   grade: string | number,
-  classNum: string | number,
-  studentNum: string | number,
   name: string
 ): string {
-  return `g${grade}_c${classNum}_n${studentNum}_${name.trim()}`;
+  return `g${grade}_${name.trim()}`;
 }
 
 const INITIAL_DEMO_SUBMISSIONS: MissionSubmission[] = [
   {
     id: 'demo-sub-1',
-    studentKey: makeStudentKey(3, 2, 14, '김민서'),
+    studentKey: makeStudentKey(3, '김민서'),
     grade: 3,
-    classNum: 2,
-    studentNum: 14,
     studentName: '김민서',
     roleSwapCategory: '아빠 ↔ 딸 (저녁 요리 & 빨래 개기)',
     roleSwapDetail: '아빠는 딸 민서 대신 뽀송하게 빨래를 개고, 민서는 아빠와 함께 저녁 된장찌개 두부를 썰고 밥상을 차렸습니다!',
@@ -31,10 +27,8 @@ const INITIAL_DEMO_SUBMISSIONS: MissionSubmission[] = [
   },
   {
     id: 'demo-sub-2',
-    studentKey: makeStudentKey(5, 1, 7, '박준우'),
+    studentKey: makeStudentKey(5, '박준우'),
     grade: 5,
-    classNum: 1,
-    studentNum: 7,
     studentName: '박준우',
     roleSwapCategory: '엄마 ↔ 아들 (분리수거 & 욕실 청소)',
     roleSwapDetail: '매번 엄마가 하시던 베란다 분리수거와 욕실 바닥 청소를 준우가 맡아서 하고, 엄마는 거실에서 편안하게 책을 읽으셨습니다.',
@@ -46,10 +40,8 @@ const INITIAL_DEMO_SUBMISSIONS: MissionSubmission[] = [
   },
   {
     id: 'demo-sub-3',
-    studentKey: makeStudentKey('유치원', 1, 3, '이사랑'),
+    studentKey: makeStudentKey('유치원', '이사랑'),
     grade: '유치원',
-    classNum: 1,
-    studentNum: 3,
     studentName: '이사랑',
     roleSwapCategory: '엄마 ↔ 사랑이 (장난감 정리 & 식탁 닦기)',
     roleSwapDetail: '엄마는 유치원생 사랑이 대신 블록과 인형을 바구니에 정리해주시고, 사랑이는 물티슈로 밥 먹기 전 식탁을 깨끗하게 닦아드렸어요!',

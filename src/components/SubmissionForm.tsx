@@ -90,10 +90,8 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
 
     const newSubmission: MissionSubmission = {
       id: existingSubmission?.id || `sub-${Date.now()}`,
-      studentKey: `g${currentUser.grade}_c${currentUser.classNum}_n${currentUser.studentNum}_${currentUser.studentName}`,
+      studentKey: `g${currentUser.grade}_${currentUser.studentName.trim()}`,
       grade: currentUser.grade,
-      classNum: currentUser.classNum,
-      studentNum: currentUser.studentNum,
       studentName: currentUser.studentName,
       roleSwapCategory: roleTitle.trim() || '우리 가족 역할 바꾸기',
       roleSwapDetail: roleDetail.trim(),
