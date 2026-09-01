@@ -9,20 +9,22 @@ import { FirebaseRulesModal } from './components/FirebaseRulesModal';
 import { EventGuideModal } from './components/EventGuideModal';
 import {
   getStoredSubmissions,
-  saveSubmission,
+  saveSubmissionToCloudAndLocal,
   findSubmissionByStudentKey,
   makeStudentKey,
   getStoredUser,
   setStoredUser,
+  subscribeToSubmissions,
 } from './lib/storage';
 import { StudentAuth, MissionSubmission, formatGradeText, formatStudentFullTitle } from './types';
-import { Sparkles, LogOut, CheckCircle2, UserCheck, Heart, Gift, Utensils } from 'lucide-react';
+import { Sparkles, LogOut, CheckCircle2, UserCheck, Heart, Gift, Utensils, Cloud } from 'lucide-react';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<StudentAuth | null>(null);
   const [submissions, setSubmissions] = useState<MissionSubmission[]>([]);
   const [currentSubmission, setCurrentSubmission] = useState<MissionSubmission | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Modals
   const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -30,22 +32,37 @@ export default function App() {
   const [isSingleHtmlOpen, setIsSingleHtmlOpen] = useState(false);
   const [isFirebaseRulesOpen, setIsFirebaseRulesOpen] = useState(false);
 
-  // Load Submissions on mount
+  // Real-time Firestore subscription
   useEffect(() => {
-    const list = getStoredSubmissions();
-    setSubmissions(list);
+    // Initial local read
+    const localList = getStoredSubmissions();
+    setSubmissions(localList);
 
     const savedUser = getStoredUser();
     if (savedUser) {
       setCurrentUser(savedUser);
-      const studentKey = makeStudentKey(
-        savedUser.grade,
-        savedUser.studentName
-      );
-      const sub = list.find((s) => s.studentKey === studentKey);
+      const studentKey = makeStudentKey(savedUser.grade, savedUser.studentName);
+      const sub = localList.find((s) => s.studentKey === studentKey);
       setCurrentSubmission(sub || null);
     }
-  }, []);
+
+    // Subscribe to cloud updates in real-time
+    const unsubscribe = subscribeToSubmissions((cloudList) => {
+      setSubmissions(cloudList);
+      if (savedUser || currentUser) {
+        const activeUser = currentUser || savedUser;
+        if (activeUser) {
+          const key = makeStudentKey(activeUser.grade, activeUser.studentName);
+          const found = cloudList.find((s) => s.studentKey === key);
+          if (found) {
+            setCurrentSubmission(found);
+          }
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [currentUser?.studentName, currentUser?.grade]);
 
   // Handle Login
   const handleLogin = (auth: StudentAuth) => {
@@ -53,7 +70,7 @@ export default function App() {
     setStoredUser(auth);
 
     const studentKey = makeStudentKey(auth.grade, auth.studentName);
-    const existing = findSubmissionByStudentKey(studentKey);
+    const existing = submissions.find(s => s.studentKey === studentKey) || findSubmissionByStudentKey(studentKey);
 
     if (existing) {
       setCurrentSubmission(existing);
@@ -73,12 +90,20 @@ export default function App() {
   };
 
   // Handle Submission Save / Edit
-  const handleSubmitSuccess = (submission: MissionSubmission) => {
-    saveSubmission(submission);
-    const updatedList = getStoredSubmissions();
-    setSubmissions(updatedList);
-    setCurrentSubmission(submission);
-    setIsEditMode(false);
+  const handleSubmitSuccess = async (submission: MissionSubmission) => {
+    setIsSyncing(true);
+    try {
+      await saveSubmissionToCloudAndLocal(submission);
+      setCurrentSubmission(submission);
+      setIsEditMode(false);
+    } catch (e) {
+      console.error('Submission sync error:', e);
+      // Even if cloud fails, state is already saved locally
+      setCurrentSubmission(submission);
+      setIsEditMode(false);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   return (

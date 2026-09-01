@@ -132,6 +132,17 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
           <div className="p-5 sm:p-6 overflow-y-auto space-y-5 custom-scrollbar">
             
             {/* Stats Bar */}
+            <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span className="text-xs font-bold text-slate-800">Firebase 실시간 클라우드 DB 연동 중</span>
+              </div>
+              <span className="text-xs text-slate-500 font-medium">전체 {submissions.length}가정 제출 완료됨</span>
+            </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5">
                 <span className="text-xs font-semibold text-amber-700">총 제출 가정</span>

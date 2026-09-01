@@ -321,12 +321,13 @@ export function generateSingleFileHtml(): string {
   <!-- =============================== -->
   <script>
     const firebaseConfig = {
-      // apiKey: "YOUR_FIREBASE_API_KEY",
-      // authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      // projectId: "YOUR_PROJECT_ID",
-      // storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      // messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      // appId: "YOUR_APP_ID"
+      projectId: "praxis-cat-4thv3",
+      appId: "1:325922854796:web:6a314e520880e99bbe28a9",
+      apiKey: "AIzaSyDt1mCMJv2Tnyj1urcymDcnIKtFZvfDbBo",
+      authDomain: "praxis-cat-4thv3.firebaseapp.com",
+      firestoreDatabaseId: "ai-studio-on-9e9c606f-325a-407e-9375-a61dee71012f",
+      storageBucket: "praxis-cat-4thv3.firebasestorage.app",
+      messagingSenderId: "325922854796"
     };
 
     let isFirebaseReady = false;
@@ -341,7 +342,7 @@ export function generateSingleFileHtml(): string {
         storage = firebase.storage();
         auth = firebase.auth();
         isFirebaseReady = true;
-        console.log("Firebase initialized successfully!");
+        console.log("Firebase initialized successfully in Single HTML mode!");
       } catch (e) {
         console.warn("Firebase config error, falling back to LocalStorage:", e);
       }

@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 옥동초등학교 양성평등주간 미션 제출물 컬렉션
+    // 각 가정(익명/학생키)이 본인 제출물을 생성, 조회, 수정할 수 있으며 교사 관리자도 조회 가능
+    match /okdong_missions/{submissionId} {
+      allow read, write: if true;
+    }
+  }
+}

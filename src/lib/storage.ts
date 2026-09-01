@@ -1,7 +1,10 @@
+import { doc, getDoc, setDoc, onSnapshot, collection, query } from 'firebase/firestore';
+import { db } from './firebase';
 import { MissionSubmission, StudentAuth } from '../types';
 
 const STORAGE_KEY_SUBMISSIONS = 'okdong_switch_on_submissions';
 const STORAGE_KEY_CURRENT_USER = 'okdong_switch_on_current_user';
+export const FIRESTORE_COLLECTION = 'okdong_missions';
 
 export function makeStudentKey(
   grade: string | number,
@@ -53,6 +56,47 @@ const INITIAL_DEMO_SUBMISSIONS: MissionSubmission[] = [
   }
 ];
 
+// Subscribe to all submissions in Firestore in real-time
+export function subscribeToSubmissions(
+  onUpdate: (submissions: MissionSubmission[]) => void,
+  onError?: (error: any) => void
+): () => void {
+  try {
+    const q = query(collection(db, FIRESTORE_COLLECTION));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const list: MissionSubmission[] = [];
+          snapshot.forEach((docSnap) => {
+            list.push(docSnap.data() as MissionSubmission);
+          });
+          // Sort by submittedAt desc
+          list.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+          
+          // Cache in local storage for fast initial render
+          localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify(list));
+          onUpdate(list);
+        } else {
+          // If Firestore is empty yet, initialize with demo submissions in local
+          const local = getStoredSubmissions();
+          onUpdate(local);
+        }
+      },
+      (err) => {
+        console.warn('Firestore snapshot error, falling back to local storage', err);
+        if (onError) onError(err);
+        onUpdate(getStoredSubmissions());
+      }
+    );
+    return unsubscribe;
+  } catch (e) {
+    console.warn('Firestore subscription failed, using local storage fallback', e);
+    onUpdate(getStoredSubmissions());
+    return () => {};
+  }
+}
+
 export function getStoredSubmissions(): MissionSubmission[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_SUBMISSIONS);
@@ -67,15 +111,43 @@ export function getStoredSubmissions(): MissionSubmission[] {
   }
 }
 
-export function saveSubmission(submission: MissionSubmission): void {
+export async function saveSubmissionToCloudAndLocal(submission: MissionSubmission): Promise<void> {
+  // 1. Save to LocalStorage for instant UI response & offline safety
   const list = getStoredSubmissions();
   const index = list.findIndex(s => s.studentKey === submission.studentKey);
+  const updatedSub = { ...submission, updatedAt: new Date().toISOString() };
   if (index >= 0) {
-    list[index] = { ...submission, updatedAt: new Date().toISOString() };
+    list[index] = updatedSub;
   } else {
-    list.unshift(submission);
+    list.unshift(updatedSub);
   }
   localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify(list));
+
+  // 2. Persist to Firestore cloud database
+  try {
+    const docRef = doc(db, FIRESTORE_COLLECTION, submission.studentKey);
+    await setDoc(docRef, updatedSub, { merge: true });
+  } catch (err) {
+    console.error('Failed to save submission to Firestore Cloud DB:', err);
+    throw err;
+  }
+}
+
+export async function fetchSubmissionFromCloud(studentKey: string): Promise<MissionSubmission | null> {
+  try {
+    const docRef = doc(db, FIRESTORE_COLLECTION, studentKey);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      return snap.data() as MissionSubmission;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch from Firestore, falling back to local storage:', err);
+  }
+  return findSubmissionByStudentKey(studentKey) || null;
+}
+
+export function saveSubmission(submission: MissionSubmission): void {
+  saveSubmissionToCloudAndLocal(submission).catch((e) => console.error(e));
 }
 
 export function findSubmissionByStudentKey(key: string): MissionSubmission | undefined {
