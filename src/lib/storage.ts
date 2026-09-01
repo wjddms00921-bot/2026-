@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, onSnapshot, collection, query } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, query, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from './firebase';
 import { MissionSubmission, StudentAuth } from '../types';
 
@@ -78,9 +78,9 @@ export function subscribeToSubmissions(
           localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify(list));
           onUpdate(list);
         } else {
-          // If Firestore is empty yet, initialize with demo submissions in local
-          const local = getStoredSubmissions();
-          onUpdate(local);
+          // If Firestore is empty, we update with empty list
+          localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify([]));
+          onUpdate([]);
         }
       },
       (err) => {
@@ -107,7 +107,7 @@ export function getStoredSubmissions(): MissionSubmission[] {
     return JSON.parse(raw);
   } catch (e) {
     console.error('Failed to load submissions from localStorage', e);
-    return INITIAL_DEMO_SUBMISSIONS;
+    return [];
   }
 }
 
@@ -131,6 +131,45 @@ export async function saveSubmissionToCloudAndLocal(submission: MissionSubmissio
     console.error('Failed to save submission to Firestore Cloud DB:', err);
     throw err;
   }
+}
+
+export async function deleteSubmissionFromCloudAndLocal(studentKey: string): Promise<void> {
+  // 1. Remove from local storage
+  const list = getStoredSubmissions().filter(s => s.studentKey !== studentKey);
+  localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify(list));
+
+  // 2. Delete from Firestore cloud database
+  try {
+    const docRef = doc(db, FIRESTORE_COLLECTION, studentKey);
+    await deleteDoc(docRef);
+  } catch (err) {
+    console.error('Failed to delete submission from Firestore Cloud DB:', err);
+    throw err;
+  }
+}
+
+export async function clearAllSubmissionsFromCloudAndLocal(): Promise<number> {
+  // 1. Empty local storage
+  localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify([]));
+
+  // 2. Delete all documents in collection in Firestore
+  let deletedCount = 0;
+  try {
+    const colRef = collection(db, FIRESTORE_COLLECTION);
+    const snap = await getDocs(colRef);
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.forEach((d) => {
+        batch.delete(d.ref);
+        deletedCount++;
+      });
+      await batch.commit();
+    }
+  } catch (err) {
+    console.error('Failed to clear submissions from Firestore Cloud DB:', err);
+    throw err;
+  }
+  return deletedCount;
 }
 
 export async function fetchSubmissionFromCloud(studentKey: string): Promise<MissionSubmission | null> {
