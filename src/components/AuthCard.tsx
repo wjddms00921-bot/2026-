@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, KeyRound, Sparkles, UserCheck, ShieldAlert, ArrowRight } from 'lucide-react';
+import { KeyRound, ShieldAlert, ArrowRight } from 'lucide-react';
 import { StudentAuth } from '../types';
 
 interface AuthCardProps {
@@ -31,17 +31,6 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
       studentName: studentName.trim(),
       password,
     });
-  };
-
-  const handleQuickDemo = (
-    demoGrade: string | number,
-    demoName: string,
-    demoPw: string
-  ) => {
-    setGrade(String(demoGrade));
-    setStudentName(demoName);
-    setPassword(demoPw);
-    setError(null);
   };
 
   return (
@@ -156,44 +145,6 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
       </form>
-
-      {/* Quick Demo family test chips */}
-      <div className="mt-6 pt-5 border-t border-slate-100">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-2.5">
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          <span>샘플 계정으로 바로 체험해보기 (클릭 시 자동 입력)</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => handleQuickDemo('유치원', '이사랑', '1234')}
-            className="text-xs px-3.5 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold border border-emerald-300 transition-colors flex items-center gap-1"
-          >
-            <span>🐣 유치원 이사랑 (제출완료)</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickDemo(3, '김민서', '1234')}
-            className="text-xs px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border border-amber-300 transition-colors flex items-center gap-1"
-          >
-            <span>✨ 3학년 김민서 (제출완료)</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickDemo(5, '박준우', '1234')}
-            className="text-xs px-3.5 py-1.5 rounded-xl bg-orange-100 hover:bg-orange-200 text-orange-900 font-bold border border-orange-300 transition-colors flex items-center gap-1"
-          >
-            <span>✨ 5학년 박준우 (제출완료)</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickDemo(2, '이서연', '5678')}
-            className="text-xs px-3.5 py-1.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-900 font-bold border border-blue-300 transition-colors flex items-center gap-1"
-          >
-            <span>📝 2학년 이서연 (신규 작성)</span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
