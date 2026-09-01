@@ -1,0 +1,6 @@
+{
+  "name": "옥동초등학교 양성평등주간 미션 '우리집 스위치 ON'",
+  "description": "옥동초등학교 학부모 및 학생 대상 양성평등주간 역할 바꾸기 미션 제출 및 확인 웹 애플리케이션",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

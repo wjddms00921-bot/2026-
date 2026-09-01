@@ -1,0 +1,89 @@
+import { MissionSubmission, StudentAuth } from '../types';
+
+const STORAGE_KEY_SUBMISSIONS = 'okdong_switch_on_submissions';
+const STORAGE_KEY_CURRENT_USER = 'okdong_switch_on_current_user';
+
+export function makeStudentKey(grade: number, classNum: number, studentNum: number, name: string): string {
+  return `g${grade}_c${classNum}_n${studentNum}_${name.trim()}`;
+}
+
+const INITIAL_DEMO_SUBMISSIONS: MissionSubmission[] = [
+  {
+    id: 'demo-sub-1',
+    studentKey: makeStudentKey(3, 2, 14, '김민서'),
+    grade: 3,
+    classNum: 2,
+    studentNum: 14,
+    studentName: '김민서',
+    roleSwapCategory: '아빠 ↔ 딸 (저녁 요리 & 빨래 개기)',
+    roleSwapDetail: '아빠는 딸 민서 대신 뽀송하게 빨래를 개고, 민서는 아빠와 함께 저녁 된장찌개 두부를 썰고 밥상을 차렸습니다!',
+    photos: [
+      'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=800&q=80'
+    ],
+    reflections: '평소에는 엄마와 아빠가 해주시는 일이 당연하다고 생각했는데, 직접 저녁을 준비하고 빨래를 개어보니 생각보다 손도 많이 가고 힘든 일이라는 걸 깨달았습니다. 아빠와 함께 역할을 바꾸어 활동하면서 우리 집안일에는 남녀나 어른, 아이의 구분이 없다는 것을 배웠습니다. 앞으로도 가족 모두가 함께 도우며 즐겁게 생활하겠습니다!',
+    submittedAt: '2026-09-01T18:30:00.000Z'
+  },
+  {
+    id: 'demo-sub-2',
+    studentKey: makeStudentKey(5, 1, 7, '박준우'),
+    grade: 5,
+    classNum: 1,
+    studentNum: 7,
+    studentName: '박준우',
+    roleSwapCategory: '엄마 ↔ 아들 (분리수거 & 욕실 청소)',
+    roleSwapDetail: '매번 엄마가 하시던 베란다 분리수거와 욕실 바닥 청소를 준우가 맡아서 하고, 엄마는 거실에서 편안하게 책을 읽으셨습니다.',
+    photos: [
+      'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80'
+    ],
+    reflections: '엄마께서 매주 힘드셨을 분리수거와 욕실 청소를 제가 직접 해보니 땀도 나고 힘들었지만, 반짝반짝 깨끗해진 욕실을 보니 정말 뿌듯했습니다. 집안일은 엄마만의 몫이 아니라 가족 구성원 모두가 공평하게 나누어야 하는 소중한 일이라는 것을 가슴 깊이 느꼈습니다. 이번 양성평등주간 미션 덕분에 가족의 소중함을 다시 한번 생각해보게 되었습니다.',
+    submittedAt: '2026-09-02T10:15:00.000Z'
+  }
+];
+
+export function getStoredSubmissions(): MissionSubmission[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_SUBMISSIONS);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify(INITIAL_DEMO_SUBMISSIONS));
+      return INITIAL_DEMO_SUBMISSIONS;
+    }
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('Failed to load submissions from localStorage', e);
+    return INITIAL_DEMO_SUBMISSIONS;
+  }
+}
+
+export function saveSubmission(submission: MissionSubmission): void {
+  const list = getStoredSubmissions();
+  const index = list.findIndex(s => s.studentKey === submission.studentKey);
+  if (index >= 0) {
+    list[index] = { ...submission, updatedAt: new Date().toISOString() };
+  } else {
+    list.unshift(submission);
+  }
+  localStorage.setItem(STORAGE_KEY_SUBMISSIONS, JSON.stringify(list));
+}
+
+export function findSubmissionByStudentKey(key: string): MissionSubmission | undefined {
+  const list = getStoredSubmissions();
+  return list.find(s => s.studentKey === key);
+}
+
+export function getStoredUser(): StudentAuth | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function setStoredUser(user: StudentAuth | null): void {
+  if (user) {
+    localStorage.setItem(STORAGE_KEY_CURRENT_USER, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(STORAGE_KEY_CURRENT_USER);
+  }
+}
