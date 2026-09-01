@@ -113,12 +113,12 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
 
         {/* 4-digit Password */}
         <div>
-          <div className="flex justify-between items-center mb-1 ml-1">
-            <label className="block text-xs font-bold text-slate-500">
-              비밀번호 (숫자 4자리) <span className="text-rose-500">*</span>
+          <div className="flex justify-between items-center mb-1.5 ml-1">
+            <label className="block text-xs font-bold text-slate-700">
+              비밀번호 (자유 숫자 4자리) <span className="text-rose-500">*</span>
             </label>
-            <span className="text-[11px] text-slate-400 font-normal">
-              제출물 조회 및 수정 시 확인용
+            <span className="text-[11px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md">
+              💡 처음 입력한 4자리가 비밀번호가 됩니다
             </span>
           </div>
           <div className="relative">
@@ -126,13 +126,25 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
               type="password"
               inputMode="numeric"
               maxLength={4}
-              placeholder="4자리 숫자 입력 (예: 1234)"
+              placeholder="기억하기 쉬운 숫자 4자리 (예: 1234, 생일 등)"
               value={password}
               onChange={(e) => setPassword(e.target.value.replace(/\D/g, '').slice(0, 4))}
               required
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm tracking-widest focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
+              className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm tracking-widest focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all placeholder:tracking-normal placeholder:font-normal placeholder:text-slate-400"
             />
             <KeyRound className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+          </div>
+          
+          {/* Password Guide Box */}
+          <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-slate-800">
+              <span className="text-blue-500">📌</span>
+              <span>비밀번호 입력 안내</span>
+            </div>
+            <p className="leading-relaxed text-[11px] text-slate-600">
+              • <strong>처음 작성 시</strong>: 기억하기 쉬운 <strong>아무 숫자 4자리</strong>(생일, 전화번호 뒷자리 등)를 정해 입력해 주세요.<br/>
+              • <strong>제출 후 재방문 시</strong>: 내가 작성한 글을 조회하거나 수정할 때 <strong>위에서 정한 4자리</strong>를 입력하시면 열람할 수 있습니다.
+            </p>
           </div>
         </div>
 
