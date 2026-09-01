@@ -56,6 +56,27 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
         <span className="text-xs text-slate-400 font-medium">유치원 ~ 6학년 자녀 학년과 이름으로 간편 로그인</span>
       </div>
 
+      {/* 📢 Big Notice Banner on Login Screen */}
+      <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-300 text-slate-950 rounded-2xl shadow-md border-2 border-amber-400 flex items-start gap-3.5">
+        <div className="w-10 h-10 rounded-2xl bg-white text-slate-900 flex items-center justify-center font-black text-xl shrink-0 shadow-xs">
+          🎁
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <span className="bg-slate-950 text-amber-300 px-2.5 py-0.5 rounded-full text-[11px] font-black tracking-wide">
+              필독 주의사항
+            </span>
+            <span className="text-xs font-black text-slate-900">참여 가족 기념 선물 안내</span>
+          </div>
+          <p className="text-xs sm:text-sm font-black leading-snug text-slate-950">
+            "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다."
+          </p>
+          <p className="text-[11px] font-bold text-slate-800">
+            ⚠️ <strong>(단, 한 가정당 1개씩 배부합니다)</strong> — 유치원·초등 형제자매 포함 가정당 1세트
+          </p>
+        </div>
+      </div>
+
       {error && (
         <div className="mb-5 p-3.5 bg-rose-50 border-2 border-rose-200 text-rose-700 rounded-2xl text-xs font-bold flex items-center gap-2">
           <ShieldAlert className="w-4 h-4 shrink-0 text-rose-500" />

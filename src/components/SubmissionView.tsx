@@ -19,6 +19,11 @@ import {
   Check,
   ShieldCheck,
   ChevronRight,
+  BookOpen,
+  Smile,
+  MessageCircle,
+  Lightbulb,
+  Home,
 } from 'lucide-react';
 import { MissionSubmission, StudentAuth, formatGradeText, formatStudentFullTitle } from '../types';
 
@@ -33,7 +38,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
   currentUser,
   onEdit,
 }) => {
-  const [activeTab, setActiveTab] = useState<'details' | 'notice'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'learning'>('details');
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   const formattedDate = new Date(submission.submittedAt).toLocaleString('ko-KR', {
@@ -59,12 +64,12 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
 
   return (
     <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-xl border-4 border-[#6BCB77] space-y-6">
-      {/* 1. 제출 완료 축하 배너 */}
-      <div className="bg-[#6BCB77] text-white rounded-[2rem] p-6 sm:p-7 shadow-md relative overflow-hidden">
+      {/* 1. 제출 완료 축하 및 교육 격려 배너 */}
+      <div className="bg-gradient-to-br from-[#6BCB77] to-[#4AA958] text-white rounded-[2rem] p-6 sm:p-7 shadow-md relative overflow-hidden">
         <div className="flex items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-white text-slate-800 flex items-center justify-center text-2xl shadow-md shrink-0">
-              🎉
+            <div className="w-12 h-12 rounded-full bg-white text-emerald-600 flex items-center justify-center text-2xl shadow-md shrink-0">
+              🌱
             </div>
             <div>
               <span className="inline-flex items-center gap-1 text-xs font-black px-3 py-1 rounded-full bg-white/20 text-white mb-1 shadow-2xs">
@@ -83,74 +88,64 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
           </div>
         </div>
 
-        <p className="text-xs sm:text-sm text-emerald-50 mt-3.5 leading-relaxed bg-black/10 rounded-2xl p-3 border border-white/15 font-medium">
-          옥동초등학교 양성평등주간 미션 <strong>'우리집 스위치 ON'</strong>에 정성껏 참여해 주셔서 감사합니다.
-          가족과 함께한 따뜻한 경험이 아이들에게 멋진 양성평등의 가치로 남길 바랍니다. ❤️
+        <p className="text-xs sm:text-sm text-emerald-50 mt-3.5 leading-relaxed bg-black/10 rounded-2xl p-3.5 border border-white/15 font-medium">
+          옥동초등학교 양성평등주간 <strong>'우리집 스위치 ON - 온(溫)가족 행복 실천'</strong>에 동참해 주셔서 감사합니다.
+          서로의 자리를 바꾸어보고 이해한 이번 실천은 우리 아이들이 <strong>배려와 평등의 소중한 가치</strong>를 마음에 새기는 훌륭한 배움의 밑거름이 됩니다. ❤️
         </p>
       </div>
 
-      {/* 2. 상단 탭 네비게이션 (제출 내역 vs 제출 후 안내사항 & 선물) */}
+      {/* 2. 상단 탭 네비게이션 */}
       <div className="flex p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200 gap-1.5">
         <button
           type="button"
           onClick={() => setActiveTab('details')}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
             activeTab === 'details'
               ? 'bg-white text-slate-900 shadow-md border border-slate-200/80 scale-[1.01]'
               : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/60'
           }`}
         >
           <FileText className="w-4 h-4 text-[#4D96FF]" />
-          <span>📋 나의 미션 제출 내역</span>
+          <span>📋 나의 미션 실천 기록</span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('notice')}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 relative ${
-            activeTab === 'notice'
+          onClick={() => setActiveTab('learning')}
+          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            activeTab === 'learning'
               ? 'bg-white text-slate-900 shadow-md border border-slate-200/80 scale-[1.01]'
               : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/60'
           }`}
         >
-          <Gift className="w-4 h-4 text-amber-500" />
-          <span>🎁 선물 배부 및 안내사항</span>
-          <span className="hidden sm:inline-block px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded-full font-bold border border-amber-300">
-            필독
-          </span>
+          <BookOpen className="w-4 h-4 text-emerald-600" />
+          <span>🌱 실천의 배움 &amp; 행사 안내</span>
         </button>
       </div>
 
       {/* 3. 탭 콘텐츠 영역 */}
       {activeTab === 'details' ? (
-        /* TAB 1: 나의 미션 제출 내역 */
+        /* TAB 1: 나의 미션 실천 기록 */
         <div className="space-y-5">
-          {/* Quick Cutlery Notice Highlight Card */}
-          <div
-            onClick={() => setActiveTab('notice')}
-            className="cursor-pointer bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100/80 hover:to-orange-100/80 border-2 border-amber-300 rounded-2xl p-4 flex items-center justify-between gap-3 transition-all group shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center text-xl shrink-0 shadow-sm">
-                🍴
+          {/* Warm Educational Highlight Card */}
+          <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-200/80 rounded-2xl p-4 sm:p-5 flex items-start justify-between gap-3 shadow-xs">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-xl shrink-0 shadow-sm mt-0.5">
+                💡
               </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-md">
-                    주의사항 안내
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md">
+                    가족 배움 실천
                   </span>
-                  <span className="text-xs font-bold text-amber-800">
-                    행사종료 이후 학생편으로 커트러리 세트가 배부됩니다.
+                  <span className="text-xs font-bold text-slate-800">
+                    "가족의 역할을 바꾸며 서로의 수고로움을 이해하고 배려하는 시간"
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs text-amber-700 mt-0.5 font-medium">
-                  단, <strong>한 가정당 1개씩</strong> 배부됩니다. 자세한 배부 일정 및 안내를 확인해보세요!
+                <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                  남녀의 구분 없이 집안일과 역할을 함께 분담하는 경험을 통해, 아이들은 일상 속에서 자연스럽게 민주적이고 평등한 가치관을 배웁니다.
                 </p>
               </div>
-            </div>
-            <div className="text-amber-700 font-bold text-xs flex items-center gap-0.5 group-hover:translate-x-1 transition-transform shrink-0">
-              <span className="hidden sm:inline">안내 보기</span>
-              <ChevronRight className="w-4 h-4" />
             </div>
           </div>
 
@@ -161,7 +156,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
                 {gradeDisplay}
               </div>
               <div>
-                <div className="text-xs text-slate-400 font-bold">참여 학생 및 가정</div>
+                <div className="text-xs text-slate-400 font-bold">실천 참여 가정</div>
                 <div className="text-sm sm:text-base font-black text-slate-900">
                   {studentTitle} 가정
                 </div>
@@ -171,7 +166,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrint}
-                className="text-xs px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors font-bold flex items-center gap-1.5 border border-slate-200"
+                className="text-xs px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors font-bold flex items-center gap-1.5 border border-slate-200 cursor-pointer"
                 title="실천 기록 인쇄"
               >
                 <Printer className="w-3.5 h-3.5" />
@@ -179,7 +174,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
               </button>
               <button
                 onClick={onEdit}
-                className="text-xs px-4 py-2 rounded-xl bg-[#4D96FF] hover:bg-[#3b82f6] text-white transition-colors font-black flex items-center gap-1.5 shadow-md hover:shadow-lg"
+                className="text-xs px-4 py-2 rounded-xl bg-[#4D96FF] hover:bg-[#3b82f6] text-white transition-colors font-black flex items-center gap-1.5 shadow-md hover:shadow-lg cursor-pointer"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 <span>내용 수정하기</span>
@@ -190,7 +185,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
           {/* 바꾼 역할 */}
           <div className="space-y-1.5">
             <span className="text-xs font-bold text-slate-500 ml-1">
-              1. 서로 바꾼 역할 (자유 실천 내용)
+              1. 우리 가족이 서로 바꾼 역할 실천
             </span>
             <div className="p-4 sm:p-5 bg-slate-50 rounded-2xl border-2 border-slate-100 space-y-2">
               <div className="font-black text-slate-900 text-sm sm:text-base flex items-center gap-2">
@@ -209,7 +204,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
               <span className="text-xs font-bold text-slate-500">
                 2. 활동 인증 사진 ({submission.photos.length}장)
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">터치하면 확대 보기</span>
+              <span className="text-[11px] text-slate-400 font-medium">터치하면 원본 확대 보기</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -240,7 +235,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
               <span className="text-xs font-bold text-slate-500">
                 3. 가족 실천 소감문 ({submission.reflections.length}자)
               </span>
-              <span className="text-[11px] text-green-600 font-bold bg-green-50 px-2.5 py-0.5 rounded-full border border-green-200">
+              <span className="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                 100자 이상 작성 완료 ✓
               </span>
             </div>
@@ -259,6 +254,23 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
             </div>
           </div>
 
+          {/* Subtle bottom cutlery reminder & guidance link */}
+          <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="text-base">🍴</span>
+              <span className="text-slate-700 font-medium">
+                참여 기념 선물(커트러리 세트)은 행사 마감 후 학생편으로 가정당 1세트 배부됩니다.
+              </span>
+            </div>
+            <button
+              onClick={() => setActiveTab('learning')}
+              className="text-amber-800 font-bold shrink-0 hover:underline flex items-center gap-0.5 cursor-pointer"
+            >
+              <span>배움 및 상세 안내 보기</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* Footer info */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 border-t border-slate-100 font-medium">
             <span className="flex items-center gap-1">
@@ -269,97 +281,140 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
           </div>
         </div>
       ) : (
-        /* TAB 2: 선물 배부 및 안내사항 탭 */
-        <div className="space-y-5">
+        /* TAB 2: 실천의 배움 & 행사 안내 */
+        <div className="space-y-6">
           
-          {/* Main Notice Banner: Requirement Exact Sentence */}
-          <div className="p-5 sm:p-6 bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 border-4 border-amber-400 rounded-3xl shadow-md space-y-3">
+          {/* Section 1: Core Educational Significance */}
+          <div className="p-6 bg-gradient-to-br from-emerald-50 via-teal-50/50 to-blue-50 border-2 border-emerald-200 rounded-3xl space-y-4">
+            <div className="flex items-center gap-2.5 text-emerald-900 font-black text-base">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg shadow-sm">
+                🌟
+              </div>
+              <span>'우리집 스위치 ON' 미션의 소중한 교육적 의미</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <div className="p-4 bg-white rounded-2xl border border-emerald-100 shadow-2xs space-y-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">
+                  1
+                </div>
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm">고정관념 허물기</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  "엄마 일", "아빠 일", "아이 일"로 고정되었던 집안일의 틀을 벗어나 누구든 함께 할 수 있음을 체험합니다.
+                </p>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-teal-100 shadow-2xs space-y-2">
+                <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center font-black text-sm">
+                  2
+                </div>
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm">역지사지 공감과 감사</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  서로의 역할을 직접 대신해보며 평소 가족 구성원이 기울였던 정성과 노고를 깊이 이해하고 감사하게 됩니다.
+                </p>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-blue-100 shadow-2xs space-y-2">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-black text-sm">
+                  3
+                </div>
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm">민주적이고 평등한 가족</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  온 가족이 협력하여 가사를 분담하는 문화를 통해, 아이들은 일상 속에서 자연스러운 성평등 감수성을 기릅니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Family Dialogue Prompt */}
+          <div className="p-5 sm:p-6 bg-amber-50/60 rounded-3xl border-2 border-amber-200 space-y-3">
             <div className="flex items-center gap-2 text-amber-900 font-black text-sm sm:text-base">
-              <span className="p-1.5 bg-amber-400 text-slate-900 rounded-xl text-lg">📢</span>
-              <span>양성평등주간 미션 참여 감사 안내 및 주의사항</span>
+              <MessageCircle className="w-5 h-5 text-amber-600" />
+              <span>💬 온 가족이 함께 나누는 따뜻한 대화 가이드</span>
             </div>
+            <p className="text-xs text-slate-600 font-medium">
+              미션을 마친 후 저녁 식사나 가족 모임 시간에 아래 질문으로 서로의 생각을 나누어보세요.
+            </p>
 
-            {/* Crucial Required Sentence Highlight */}
-            <div className="p-4 bg-white rounded-2xl border-2 border-amber-300 shadow-inner">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-black text-base shrink-0 mt-0.5">
-                  !
-                </div>
-                <div>
-                  <span className="text-xs font-black text-rose-600 uppercase tracking-wider block mb-1">
-                    [필독 주의사항]
-                  </span>
-                  <p className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-                    "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다. (단, 한 가정당 1개씩 배부합니다)"
-                  </p>
-                </div>
+            <div className="space-y-2 pt-1 text-xs sm:text-sm">
+              <div className="p-3.5 bg-white rounded-xl border border-amber-200/80 flex items-start gap-2.5">
+                <span className="text-amber-500 font-bold shrink-0">Q1.</span>
+                <span className="text-slate-800 font-semibold">
+                  "오늘 바꾼 역할을 직접 해보면서 생각보다 힘들었거나 재미있었던 점은 무엇이었나요?"
+                </span>
+              </div>
+              <div className="p-3.5 bg-white rounded-xl border border-amber-200/80 flex items-start gap-2.5">
+                <span className="text-amber-500 font-bold shrink-0">Q2.</span>
+                <span className="text-slate-800 font-semibold">
+                  "우리 가족이 앞으로 서로를 더 많이 돕고 배려하기 위해 매일 실천할 수 있는 작은 약속은 무엇일까요?"
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Detailed Guidance Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* Card 1: Gift Details */}
-            <div className="p-5 bg-emerald-50/70 rounded-2xl border-2 border-emerald-200 space-y-3">
-              <div className="flex items-center gap-2 text-emerald-900 font-black text-sm">
-                <Utensils className="w-5 h-5 text-emerald-600" />
-                <span>🎁 기념 선물 안내</span>
+          {/* Section 3: Event & Gift Distribution Notice */}
+          <div className="p-5 sm:p-6 bg-slate-50 rounded-3xl border-2 border-slate-200 space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 text-slate-900 font-black text-sm sm:text-base">
+                <Gift className="w-5 h-5 text-purple-600" />
+                <span>행사 안내 및 참여 기념 선물 배부</span>
               </div>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>품목:</strong> 양성평등 실천 기념 친환경 커트러리 세트 (수저, 포크, 젓가락 &amp; 전용 휴대용 케이스)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>지급 대상:</strong> 유치원 및 1~6학년 미션 성실 참여 및 제출 가정</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>의미:</strong> 온 가족이 함께 식탁에서 식사를 나누고 역할을 분담하자는 따뜻한 약속의 의미를 담았습니다.</span>
-                </li>
-              </ul>
+              <span className="text-xs text-purple-700 bg-purple-100 font-bold px-2.5 py-0.5 rounded-full">
+                옥동초등학교 양성평등주간
+              </span>
             </div>
 
-            {/* Card 2: Distribution Method */}
-            <div className="p-5 bg-blue-50/70 rounded-2xl border-2 border-blue-200 space-y-3">
-              <div className="flex items-center gap-2 text-blue-900 font-black text-sm">
-                <Calendar className="w-5 h-5 text-blue-600" />
-                <span>🏫 배부 일정 및 수령 방법</span>
+            {/* Exact Required Sentence with context */}
+            <div className="p-4 bg-gradient-to-r from-amber-100 via-amber-50 to-orange-100 rounded-2xl border-2 border-amber-300 space-y-1">
+              <div className="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                <span className="p-1 bg-amber-400 text-slate-950 rounded-md text-xs">📢</span>
+                <span>배부 안내 및 유의사항</span>
               </div>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span><strong>제출 마감:</strong> 2026년 9월 11일(금) 23:59까지</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span><strong>배부 시기:</strong> 행사 마감 후 참여 명단 확인 후 9월 중순 배부</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span><strong>배부 방식:</strong> 각 학급 담임선생님을 통해 <strong>학생편으로 가정에 직접 전달</strong></span>
-                </li>
-              </ul>
+              <p className="text-sm sm:text-base font-black text-slate-950 leading-snug pt-1">
+                "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다."
+              </p>
+              <p className="text-xs font-bold text-rose-600">
+                (단, 한 가정당 1개씩 배부합니다 — 형제/자매 중복 수령 제한)
+              </p>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-700 font-medium">
+              <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1">
+                <span className="text-xs text-slate-400 font-bold block">선물의 상징적 의미</span>
+                <p className="text-slate-800 font-bold">
+                  친환경 커트러리(수저·포크·젓가락) 세트
+                </p>
+                <p className="text-xs text-slate-500">
+                  온 가족이 둘러앉아 따뜻한 밥상을 나누며, 식사 준비와 정리를 함께 분담하자는 약속을 담았습니다.
+                </p>
+              </div>
+
+              <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1">
+                <span className="text-xs text-slate-400 font-bold block">배부 일정 및 방식</span>
+                <p className="text-slate-800 font-bold">
+                  9월 11일(금) 행사 마감 후 9월 중순 전달
+                </p>
+                <p className="text-xs text-slate-500">
+                  각 학급 담임선생님을 통해 학생편으로 가정에 안전하게 전달됩니다.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Household Restriction Detailed Notice */}
-          <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-2">
-            <div className="flex items-center gap-2 text-slate-800 font-black text-sm">
-              <HelpCircle className="w-4 h-4 text-amber-500" />
+          {/* Section 4: FAQ */}
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-xs sm:text-sm">
+              <HelpCircle className="w-4 h-4 text-slate-500" />
               <span>자주 묻는 질문 (FAQ)</span>
             </div>
 
-            <div className="space-y-2.5 text-xs text-slate-600 font-medium pt-1">
+            <div className="space-y-2 text-xs text-slate-600 font-medium pt-1">
               <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
                 <div className="font-bold text-slate-900">
                   Q. 형제나 자매가 유치원과 초등학교에 각각 다니는데 선물은 어떻게 받나요?
                 </div>
                 <div className="text-slate-600 pl-2 border-l-2 border-amber-400">
-                  A. 본 행사는 <strong>가정 단위</strong> 실천 프로그램으로 운영되며, <strong>한 가정당 1세트</strong>만 배부됩니다. 형제/자매 중 1명의 학생편으로 전달되오니 양해 부탁드립니다.
+                  A. 본 행사는 <strong>가정 단위</strong> 실천 프로그램으로 운영되며, <strong>한 가정당 1세트</strong>만 배부됩니다. 형제/자매 중 1명의 학생편으로 전달됩니다.
                 </div>
               </div>
 
@@ -368,7 +423,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
                   Q. 이미 제출했는데 사진이나 소감을 바꾸고 싶어요.
                 </div>
                 <div className="text-slate-600 pl-2 border-l-2 border-amber-400">
-                  A. 9월 11일 행사 마감 전까지 상단 <strong>[내용 수정하기]</strong> 버튼을 누르시면 언제든지 자유롭게 수정하여 다시 제출하실 수 있습니다.
+                  A. 9월 11일 행사 마감 전까지 상단 <strong>[내용 수정하기]</strong> 버튼을 누르시면 언제든지 자유롭게 수정하실 수 있습니다.
                 </div>
               </div>
             </div>
@@ -378,9 +433,9 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
           <div className="pt-2 flex justify-end">
             <button
               onClick={() => setActiveTab('details')}
-              className="px-5 py-2.5 bg-[#4D96FF] hover:bg-[#3b82f6] text-white text-xs sm:text-sm font-bold rounded-xl shadow transition-colors flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-[#4D96FF] hover:bg-[#3b82f6] text-white text-xs sm:text-sm font-bold rounded-xl shadow transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <span>📋 나의 제출 내역 확인하기</span>
+              <span>📋 나의 실천 기록 보기</span>
             </button>
           </div>
 
@@ -406,7 +461,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
               <span className="text-xs text-slate-600 font-semibold">활동 인증 사진 원본</span>
               <button
                 onClick={() => setSelectedPhoto(null)}
-                className="px-3 py-1 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700"
+                className="px-3 py-1 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700 cursor-pointer"
               >
                 닫기
               </button>
@@ -417,3 +472,4 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
     </div>
   );
 };
+

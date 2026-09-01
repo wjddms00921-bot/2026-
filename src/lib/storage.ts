@@ -171,3 +171,45 @@ export function setStoredUser(user: StudentAuth | null): void {
     localStorage.removeItem(STORAGE_KEY_CURRENT_USER);
   }
 }
+
+const STORAGE_KEY_ADMIN_PW = 'okdong_admin_custom_pw';
+const SETTINGS_COLLECTION = 'okdong_settings';
+const ADMIN_DOC_ID = 'admin_auth';
+
+export function getStoredAdminPassword(): string {
+  try {
+    return localStorage.getItem(STORAGE_KEY_ADMIN_PW) || '1234';
+  } catch (e) {
+    return '1234';
+  }
+}
+
+export async function fetchAdminPasswordFromCloud(): Promise<string> {
+  try {
+    const docRef = doc(db, SETTINGS_COLLECTION, ADMIN_DOC_ID);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data && data.password) {
+        localStorage.setItem(STORAGE_KEY_ADMIN_PW, data.password);
+        return data.password;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch admin password from Firestore:', err);
+  }
+  return getStoredAdminPassword();
+}
+
+export async function saveAdminPasswordToCloudAndLocal(newPw: string): Promise<void> {
+  const cleanPw = newPw.trim();
+  localStorage.setItem(STORAGE_KEY_ADMIN_PW, cleanPw);
+  try {
+    const docRef = doc(db, SETTINGS_COLLECTION, ADMIN_DOC_ID);
+    await setDoc(docRef, { password: cleanPw, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch (err) {
+    console.error('Failed to save admin password to Firestore:', err);
+    throw err;
+  }
+}
+

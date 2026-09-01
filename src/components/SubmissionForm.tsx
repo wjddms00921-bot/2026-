@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, Upload, Trash2, CheckCircle2, AlertCircle, Sparkles, ImagePlus, ArrowLeft, RefreshCw, Lightbulb } from 'lucide-react';
+import { Camera, Upload, Trash2, CheckCircle2, AlertCircle, Sparkles, ImagePlus, ArrowLeft, RefreshCw, Lightbulb, Gift, AlertTriangle, Check, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { MissionSubmission, StudentAuth } from '../types';
 
@@ -32,6 +32,8 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
   const [reflections, setReflections] = useState(existingSubmission?.reflections || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [pendingSubmission, setPendingSubmission] = useState<MissionSubmission | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const charCount = reflections.length;
   const isLengthValid = charCount >= 100;
@@ -86,8 +88,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
     e.preventDefault();
     if (!isFormValid || isSubmitting) return;
 
-    setIsSubmitting(true);
-
     const newSubmission: MissionSubmission = {
       id: existingSubmission?.id || `sub-${Date.now()}`,
       studentKey: `g${currentUser.grade}_${currentUser.studentName.trim()}`,
@@ -101,10 +101,13 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
       updatedAt: new Date().toISOString(),
     };
 
+    setPendingSubmission(newSubmission);
+    setShowConfirmModal(true);
+
     // Confetti effect
     try {
       confetti({
-        particleCount: 100,
+        particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
         colors: ['#f59e0b', '#f97316', '#10b981', '#3b82f6', '#ec4899'],
@@ -112,11 +115,13 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
     } catch (e) {
       // ignore
     }
+  };
 
-    setTimeout(() => {
-      onSubmit(newSubmission);
-      setIsSubmitting(false);
-    }, 400);
+  const handleFinalConfirm = () => {
+    if (!pendingSubmission) return;
+    setIsSubmitting(true);
+    setShowConfirmModal(false);
+    onSubmit(pendingSubmission);
   };
 
   const progressPercent = Math.min(100, Math.round((charCount / 100) * 100));
@@ -124,7 +129,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
   return (
     <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-xl border-4 border-[#4D96FF] relative flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
         <div>
           <div className="bg-[#4D96FF] text-white w-fit px-3.5 py-1 rounded-full text-xs font-bold mb-2 shadow-xs">
             {existingSubmission ? '미션 수정' : '미션 참여하기'}
@@ -141,12 +146,33 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="text-xs px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors font-bold flex items-center gap-1.5 border border-slate-200"
+            className="text-xs px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors font-bold flex items-center gap-1.5 border border-slate-200 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>조회 화면</span>
           </button>
         )}
+      </div>
+
+      {/* 📢 BIG PROMINENT NOTICE BANNER */}
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-300 text-slate-950 rounded-2xl shadow-md border-2 border-amber-400 flex items-start gap-3.5 mb-5">
+        <div className="w-11 h-11 rounded-2xl bg-white text-slate-900 flex items-center justify-center font-black text-2xl shrink-0 shadow-sm">
+          🎁
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <span className="bg-slate-950 text-amber-300 px-2.5 py-0.5 rounded-full text-[11px] font-black tracking-wide">
+              필독 주의사항
+            </span>
+            <span className="text-xs font-black text-slate-900">참여 가족 기념 선물 안내</span>
+          </div>
+          <p className="text-sm sm:text-base font-black leading-snug text-slate-950">
+            "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다."
+          </p>
+          <p className="text-xs font-bold text-slate-800">
+            ⚠️ <strong>(단, 한 가정당 1개씩 배부합니다)</strong> — 형제나 자매가 각각 제출하더라도 선물은 가정당 1세트만 배부됩니다.
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col">
@@ -187,7 +213,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => setRoleTitle(idea)}
-                  className="text-[11px] px-2.5 py-1 bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 rounded-lg border border-slate-200 hover:border-blue-300 font-medium transition-colors"
+                  className="text-[11px] px-2.5 py-1 bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 rounded-lg border border-slate-200 hover:border-blue-300 font-medium transition-colors cursor-pointer"
                 >
                   {idea}
                 </button>
@@ -256,7 +282,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
               <button
                 type="button"
                 onClick={handleAddSamplePhoto}
-                className="text-xs text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1 rounded-xl transition-colors font-bold inline-flex items-center gap-1.5 shadow-2xs"
+                className="text-xs text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1 rounded-xl transition-colors font-bold inline-flex items-center gap-1.5 shadow-2xs cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 <span>샘플 활동 사진 추가하기 (테스트용)</span>
@@ -281,7 +307,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemovePhoto(idx)}
-                      className="p-2 bg-rose-600 text-white rounded-full shadow-lg hover:bg-rose-700 transition-colors"
+                      className="p-2 bg-rose-600 text-white rounded-full shadow-lg hover:bg-rose-700 transition-colors cursor-pointer"
                       title="사진 삭제"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -396,6 +422,59 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
           </button>
         </div>
       </form>
+
+      {/* 🎉 POST-SUBMISSION CONFIRMATION & NOTICE MODAL */}
+      {showConfirmModal && pendingSubmission && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-4 border-[#6BCB77] space-y-5 animate-in fade-in zoom-in duration-200">
+            {/* Top Celebration Icon */}
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                🎉
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                미션 실천 내용이 준비되었습니다!
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium">
+                {currentUser.studentName} 학생 가정의 소중한 역할 바꾸기 실천이 정상 접수됩니다.
+              </p>
+            </div>
+
+            {/* Crucial Notice Spotlight Card */}
+            <div className="p-5 bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 border-3 border-amber-400 rounded-2xl space-y-2.5 shadow-sm">
+              <div className="flex items-center gap-2 text-amber-900 font-black text-sm">
+                <span className="p-1 bg-amber-400 text-slate-950 rounded-lg text-sm">📢</span>
+                <span>[필독] 참여 가족 기념 선물 및 주의사항</span>
+              </div>
+              
+              <div className="p-3.5 bg-white rounded-xl border border-amber-300 shadow-2xs">
+                <p className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                  "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다."
+                </p>
+                <p className="text-xs sm:text-sm font-bold text-rose-600 mt-1">
+                  (단, 한 가정당 1개씩 배부합니다)
+                </p>
+              </div>
+
+              <ul className="text-xs text-slate-700 font-medium space-y-1 pl-1">
+                <li>• <strong>배부 방식:</strong> 행사 마감(9월 11일) 후 담임선생님을 통해 학생편으로 가정에 전달됩니다.</li>
+                <li>• <strong>중복 제한:</strong> 형제/자매가 유치원이나 초등학교에 함께 재학 중이더라도 가정당 1세트가 지급됩니다.</li>
+              </ul>
+            </div>
+
+            {/* Confirm Action Button */}
+            <button
+              type="button"
+              onClick={handleFinalConfirm}
+              className="w-full py-4 bg-[#6BCB77] hover:bg-[#5bb866] text-white font-black rounded-2xl text-base sm:text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Check className="w-5 h-5 stroke-[3]" />
+              <span>네, 확인했습니다! 최종 제출 완료 🚀</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
