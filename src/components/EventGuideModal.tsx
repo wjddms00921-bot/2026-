@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, BookOpen, Sparkles, CheckCircle2, Heart, Award, ShieldCheck } from 'lucide-react';
+import { X, BookOpen, Sparkles, CheckCircle2, Heart, Award, ShieldCheck, Gift, Utensils } from 'lucide-react';
 
 interface EventGuideModalProps {
   isOpen: boolean;
@@ -42,8 +42,22 @@ export const EventGuideModal: React.FC<EventGuideModalProps> = ({ isOpen, onClos
               <span>미션 기획 의도: '우리집 스위치 ON'이란?</span>
             </div>
             <p className="leading-relaxed text-slate-700">
-              가정 내에서 고정관념처럼 굳어져 있던 성별 및 세대 역할을 하루 동안 서로 바꾸어(Switch) 실천해 봄으로써,
-              서로의 수고로움을 이해하고 존중과 배려의 양성평등 가치를 체험하는 옥동초등학교 가족 참여형 프로젝트입니다.
+              가정 내에서 고정관념처럼 굳어져 있던 역할을 하루 동안 서로 바꾸어(Switch) 자유롭게 실천해 봄으로써,
+              서로의 수고로움을 이해하고 존중과 배려의 양성평등 가치를 체험하는 옥동초등학교 가족(유치원 및 1~6학년) 참여형 프로젝트입니다.
+            </p>
+          </div>
+
+          {/* Gift Notice (Required Caution) */}
+          <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-amber-400 rounded-2xl p-4 sm:p-5 space-y-2">
+            <div className="flex items-center gap-2 font-black text-amber-900 text-sm">
+              <Gift className="w-5 h-5 text-amber-600" />
+              <span>🎁 참여 가족 기념 선물 및 필독 주의사항</span>
+            </div>
+            <div className="p-3 bg-white rounded-xl border border-amber-300 font-black text-slate-900 text-xs sm:text-sm">
+              "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다. (단, 한 가정당 1개씩 배부합니다)"
+            </div>
+            <p className="text-[11px] text-amber-800 font-medium">
+              * 정성껏 미션을 수행하고 제출을 완료한 가정에 친환경 커트러리 세트(수저·포크·케이스)가 전달됩니다.
             </p>
           </div>
 
@@ -58,8 +72,8 @@ export const EventGuideModal: React.FC<EventGuideModalProps> = ({ isOpen, onClos
               <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
                 <div>
-                  <strong className="text-slate-800 block text-xs sm:text-sm">가족 역할 바꾸기 주제 정하기</strong>
-                  <span className="text-slate-600 text-xs">예: 아빠가 저녁 식사 준비 &amp; 딸이 빨래 개기 / 엄마가 휴식 &amp; 아들이 욕실 청소</span>
+                  <strong className="text-slate-800 block text-xs sm:text-sm">틀 없이 자유롭게 가족 역할 바꾸기</strong>
+                  <span className="text-slate-600 text-xs">정해진 틀 없이 우리 가족만의 특별한 역할 바꾸기를 자유롭게 계획하고 실천합니다.</span>
                 </div>
               </div>
 
@@ -83,7 +97,7 @@ export const EventGuideModal: React.FC<EventGuideModalProps> = ({ isOpen, onClos
                 <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center shrink-0">4</span>
                 <div>
                   <strong className="text-slate-800 block text-xs sm:text-sm">웹앱 로그인 후 제출</strong>
-                  <span className="text-slate-600 text-xs">자녀의 학적(학년/반/번호/이름)과 4자리 비밀번호로 로그인하여 제출 완료합니다.</span>
+                  <span className="text-slate-600 text-xs">유치원 또는 1~6학년 자녀 정보와 4자리 비밀번호로 로그인하여 제출 완료합니다.</span>
                 </div>
               </div>
             </div>
@@ -95,8 +109,9 @@ export const EventGuideModal: React.FC<EventGuideModalProps> = ({ isOpen, onClos
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>안내 및 유의사항</span>
             </div>
-            <ul className="list-disc list-inside space-y-1 text-emerald-800/90 leading-relaxed pl-1">
+            <ul className="list-disc list-inside space-y-1 text-emerald-800/90 leading-relaxed pl-1 font-medium">
               <li><strong>제출 마감일:</strong> 9월 11일(금) 23:59까지</li>
+              <li><strong>참여 대상:</strong> 옥동초등학교 병설유치원 및 1~6학년 전체 재학생 가정</li>
               <li><strong>개인정보 보호:</strong> 제출된 모든 내용은 담당 교사 외에 절대 외부에 공개되지 않습니다.</li>
               <li><strong>수정 안내:</strong> 마감일 전까지는 언제든 로그인하여 제출 내용을 보완하거나 수정할 수 있습니다.</li>
             </ul>

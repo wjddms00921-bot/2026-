@@ -3,7 +3,12 @@ import { MissionSubmission, StudentAuth } from '../types';
 const STORAGE_KEY_SUBMISSIONS = 'okdong_switch_on_submissions';
 const STORAGE_KEY_CURRENT_USER = 'okdong_switch_on_current_user';
 
-export function makeStudentKey(grade: number, classNum: number, studentNum: number, name: string): string {
+export function makeStudentKey(
+  grade: string | number,
+  classNum: string | number,
+  studentNum: string | number,
+  name: string
+): string {
   return `g${grade}_c${classNum}_n${studentNum}_${name.trim()}`;
 }
 
@@ -38,6 +43,21 @@ const INITIAL_DEMO_SUBMISSIONS: MissionSubmission[] = [
     ],
     reflections: '엄마께서 매주 힘드셨을 분리수거와 욕실 청소를 제가 직접 해보니 땀도 나고 힘들었지만, 반짝반짝 깨끗해진 욕실을 보니 정말 뿌듯했습니다. 집안일은 엄마만의 몫이 아니라 가족 구성원 모두가 공평하게 나누어야 하는 소중한 일이라는 것을 가슴 깊이 느꼈습니다. 이번 양성평등주간 미션 덕분에 가족의 소중함을 다시 한번 생각해보게 되었습니다.',
     submittedAt: '2026-09-02T10:15:00.000Z'
+  },
+  {
+    id: 'demo-sub-3',
+    studentKey: makeStudentKey('유치원', 1, 3, '이사랑'),
+    grade: '유치원',
+    classNum: 1,
+    studentNum: 3,
+    studentName: '이사랑',
+    roleSwapCategory: '엄마 ↔ 사랑이 (장난감 정리 & 식탁 닦기)',
+    roleSwapDetail: '엄마는 유치원생 사랑이 대신 블록과 인형을 바구니에 정리해주시고, 사랑이는 물티슈로 밥 먹기 전 식탁을 깨끗하게 닦아드렸어요!',
+    photos: [
+      'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80'
+    ],
+    reflections: '엄마가 매일 제가 어지른 장난감을 치우느라 힘드셨을 텐데 제가 직접 식탁도 닦고 엄마를 도와드리니 엄마가 꼭 안아주시며 기뻐하셨어요. 유치원에서도 친구들과 사이좋게 지내고 집에서도 스스로 할 수 있는 일은 혼자서 척척 해내는 멋진 어린이가 될래요!',
+    submittedAt: '2026-09-02T14:20:00.000Z'
   }
 ];
 

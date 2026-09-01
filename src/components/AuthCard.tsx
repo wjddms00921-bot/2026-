@@ -7,9 +7,9 @@ interface AuthCardProps {
 }
 
 export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
-  const [grade, setGrade] = useState<number | ''>('');
-  const [classNum, setClassNum] = useState<number | ''>('');
-  const [studentNum, setStudentNum] = useState<number | ''>('');
+  const [grade, setGrade] = useState<string>('');
+  const [classNum, setClassNum] = useState<string>('');
+  const [studentNum, setStudentNum] = useState<string>('');
   const [studentName, setStudentName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +19,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
     setError(null);
 
     if (!grade || !classNum || !studentNum || !studentName.trim()) {
-      setError('학년, 반, 번호, 학생 이름을 모두 입력해 주세요.');
+      setError('학년(유치원), 반, 번호, 학생 이름을 모두 입력해 주세요.');
       return;
     }
 
@@ -29,7 +29,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
     }
 
     onLogin({
-      grade: Number(grade),
+      grade: grade === '유치원' ? '유치원' : Number(grade),
       classNum: Number(classNum),
       studentNum: Number(studentNum),
       studentName: studentName.trim(),
@@ -37,10 +37,16 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
     });
   };
 
-  const handleQuickDemo = (demoGrade: number, demoClass: number, demoNum: number, demoName: string, demoPw: string) => {
-    setGrade(demoGrade);
-    setClassNum(demoClass);
-    setStudentNum(demoNum);
+  const handleQuickDemo = (
+    demoGrade: string | number,
+    demoClass: number,
+    demoNum: number,
+    demoName: string,
+    demoPw: string
+  ) => {
+    setGrade(String(demoGrade));
+    setClassNum(String(demoClass));
+    setStudentNum(String(demoNum));
     setStudentName(demoName);
     setPassword(demoPw);
     setError(null);
@@ -55,7 +61,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">가정별 로그인 &amp; 참여</h2>
         </div>
-        <span className="text-xs text-slate-400 font-medium">자녀의 학적 정보로 간편 로그인</span>
+        <span className="text-xs text-slate-400 font-medium">유치원 ~ 6학년 자녀 학적 정보로 간편 로그인</span>
       </div>
 
       {error && (
@@ -70,15 +76,16 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
-              학년 <span className="text-rose-500">*</span>
+              학년/과정 <span className="text-rose-500">*</span>
             </label>
             <select
               value={grade}
-              onChange={(e) => setGrade(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setGrade(e.target.value)}
               required
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-3 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-2.5 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
             >
               <option value="">선택</option>
+              <option value="유치원">유치원</option>
               <option value="1">1학년</option>
               <option value="2">2학년</option>
               <option value="3">3학년</option>
@@ -98,7 +105,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
               max="20"
               placeholder="예: 2"
               value={classNum}
-              onChange={(e) => setClassNum(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setClassNum(e.target.value)}
               required
               className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-3 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
             />
@@ -114,7 +121,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
               max="50"
               placeholder="예: 14"
               value={studentNum}
-              onChange={(e) => setStudentNum(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setStudentNum(e.target.value)}
               required
               className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-3 sm:px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white outline-none font-bold text-slate-800 transition-all"
             />
@@ -178,6 +185,13 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLogin }) => {
           <span>샘플 계정으로 바로 체험해보기 (클릭 시 자동 입력)</span>
         </div>
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => handleQuickDemo('유치원', 1, 3, '이사랑', '1234')}
+            className="text-xs px-3.5 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold border border-emerald-300 transition-colors flex items-center gap-1"
+          >
+            <span>🐣 유치원 1반 3번 이사랑 (제출완료)</span>
+          </button>
           <button
             type="button"
             onClick={() => handleQuickDemo(3, 2, 14, '김민서', '1234')}

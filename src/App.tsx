@@ -15,8 +15,8 @@ import {
   getStoredUser,
   setStoredUser,
 } from './lib/storage';
-import { StudentAuth, MissionSubmission } from './types';
-import { Sparkles, LogOut, CheckCircle2, UserCheck, Heart } from 'lucide-react';
+import { StudentAuth, MissionSubmission, formatGradeText, formatStudentFullTitle } from './types';
+import { Sparkles, LogOut, CheckCircle2, UserCheck, Heart, Gift, Utensils } from 'lucide-react';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<StudentAuth | null>(null);
@@ -101,13 +101,13 @@ export default function App() {
         {currentUser && (
           <div className="mb-6 bg-white border-2 border-amber-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#FFD93D] text-slate-900 flex items-center justify-center font-black text-sm shadow-inner border border-amber-300">
-                {currentUser.grade}
+              <div className="w-10 h-10 rounded-2xl bg-[#FFD93D] text-slate-900 flex items-center justify-center font-black text-xs sm:text-sm shadow-inner border border-amber-300">
+                {formatGradeText(currentUser.grade)}
               </div>
               <div>
                 <div className="text-xs text-slate-500 font-bold">현재 접속 중인 가정</div>
                 <div className="text-sm sm:text-base font-black text-slate-900">
-                  {currentUser.grade}학년 {currentUser.classNum}반 {currentUser.studentNum}번 {currentUser.studentName} 학생 가정
+                  {formatStudentFullTitle(currentUser.grade, currentUser.classNum, currentUser.studentNum, currentUser.studentName)} 가정
                 </div>
               </div>
             </div>
@@ -135,17 +135,17 @@ export default function App() {
                 '우리집 <br className="hidden sm:inline" />스위치 ON'
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-                가족과 함께 역할을 바꾸어 생활해보고, 서로의 마음을 이해해보는 따뜻한 양성평등 실천 캠페인입니다.
+                유치원부터 6학년까지 모든 가족이 틀 없이 자유롭게 역할을 바꾸어 생활해보고 서로의 마음을 이해해보는 따뜻한 양성평등 실천 캠페인입니다.
               </p>
 
               <ul className="mt-6 space-y-3.5">
                 <li className="flex items-start space-x-3">
                   <span className="bg-orange-100 text-orange-600 rounded-full p-1 text-xs font-bold shrink-0">✓</span>
-                  <span className="text-xs sm:text-sm font-bold text-slate-700">부모님과 자녀의 가사 역할 바꾸기</span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-700">자유롭게 가족 간 역할 바꾸기 내용 작성</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <span className="bg-orange-100 text-orange-600 rounded-full p-1 text-xs font-bold shrink-0">✓</span>
-                  <span className="text-xs sm:text-sm font-bold text-slate-700">함께 가사 분담 체험하고 사진 남기기</span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-700">활동 인증 사진 1장 이상 업로드</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <span className="bg-orange-100 text-orange-600 rounded-full p-1 text-xs font-bold shrink-0">✓</span>
@@ -154,8 +154,15 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-xs text-blue-700 leading-relaxed font-medium">
-              💡 <strong>안내:</strong> 제출된 소감문은 학교 교육활동 공유 자료로 익명 활용될 수 있습니다.
+            {/* Gift & Notice Card */}
+            <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-xs text-amber-900 leading-relaxed space-y-1.5 font-medium">
+              <div className="flex items-center gap-1.5 font-black text-amber-950">
+                <Gift className="w-4 h-4 text-amber-600" />
+                <span>기념 선물 배부 안내 (주의사항)</span>
+              </div>
+              <p className="text-[11px] text-amber-800 font-bold bg-white/80 p-2 rounded-xl border border-amber-200">
+                "행사종료 이후 학생편으로 커트러리 세트가 배부됩니다. (단, 한 가정당 1개씩 배부합니다)"
+              </p>
             </div>
           </section>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, Upload, Trash2, CheckCircle2, AlertCircle, Sparkles, ImagePlus, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Camera, Upload, Trash2, CheckCircle2, AlertCircle, Sparkles, ImagePlus, ArrowLeft, RefreshCw, Lightbulb } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { MissionSubmission, StudentAuth } from '../types';
 
@@ -10,14 +10,12 @@ interface SubmissionFormProps {
   onCancel?: () => void;
 }
 
-const PRESET_ROLE_CATEGORIES = [
-  '아빠 ↔ 딸 (저녁 요리 & 밥상 차리기 / 빨래 개기)',
-  '아빠 ↔ 아들 (욕실 청소 & 분리수거 / 설거지)',
-  '엄마 ↔ 아들 (빨래 돌리기 & 건조 / 방 정리)',
-  '엄마 ↔ 딸 (거실 청소 & 화분 돌보기 / 장보기)',
-  '부모님 ↔ 자녀 (가족 하루 일정 계획 & 저녁 준비)',
-  '형제 ↔ 자매 (각자 방 청소 및 동생 돌보기 역할 교대)',
-  '직접 입력 (우리 가족만의 특별한 역할 바꾸기)',
+const ROLE_IDEAS = [
+  '아빠 ↔ 딸 (저녁 요리 & 빨래 개기)',
+  '엄마 ↔ 아들 (분리수거 & 욕실 청소)',
+  '부모님 ↔ 자녀 (집안일 및 스케줄 관리)',
+  '형제 ↔ 자매 (방 청소 및 정리 정돈)',
+  '할머니/할아버지 ↔ 손자/손녀 (식탁 닦기 & 화분 돌보기)'
 ];
 
 export const SubmissionForm: React.FC<SubmissionFormProps> = ({
@@ -26,18 +24,8 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [roleCategory, setRoleCategory] = useState(
-    existingSubmission?.roleSwapCategory || PRESET_ROLE_CATEGORIES[0]
-  );
-  const [isCustomCategory, setIsCustomCategory] = useState(
-    existingSubmission?.roleSwapCategory
-      ? !PRESET_ROLE_CATEGORIES.slice(0, -1).includes(existingSubmission.roleSwapCategory)
-      : false
-  );
-  const [customCategoryText, setCustomCategoryText] = useState(
-    existingSubmission?.roleSwapCategory && !PRESET_ROLE_CATEGORIES.slice(0, -1).includes(existingSubmission.roleSwapCategory)
-      ? existingSubmission.roleSwapCategory
-      : ''
+  const [roleTitle, setRoleTitle] = useState(
+    existingSubmission?.roleSwapCategory || ''
   );
   const [roleDetail, setRoleDetail] = useState(existingSubmission?.roleSwapDetail || '');
   const [photos, setPhotos] = useState<string[]>(existingSubmission?.photos || []);
@@ -48,7 +36,8 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
   const charCount = reflections.length;
   const isLengthValid = charCount >= 100;
   const isPhotosValid = photos.length >= 1;
-  const isFormValid = isLengthValid && isPhotosValid && roleDetail.trim().length > 0;
+  const isRoleValid = roleTitle.trim().length > 0 && roleDetail.trim().length > 0;
+  const isFormValid = isLengthValid && isPhotosValid && isRoleValid;
 
   // Handle Photo files
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,8 +88,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
 
     setIsSubmitting(true);
 
-    const finalCategory = isCustomCategory ? customCategoryText.trim() : roleCategory;
-
     const newSubmission: MissionSubmission = {
       id: existingSubmission?.id || `sub-${Date.now()}`,
       studentKey: `g${currentUser.grade}_c${currentUser.classNum}_n${currentUser.studentNum}_${currentUser.studentName}`,
@@ -108,7 +95,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
       classNum: currentUser.classNum,
       studentNum: currentUser.studentNum,
       studentName: currentUser.studentName,
-      roleSwapCategory: finalCategory || '가족 역할 바꾸기',
+      roleSwapCategory: roleTitle.trim() || '우리 가족 역할 바꾸기',
       roleSwapDetail: roleDetail.trim(),
       photos,
       reflections: reflections.trim(),
@@ -148,7 +135,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
             {existingSubmission ? '✏️ 미션 실천 내용 수정하기' : '📝 미션 실천 내용 작성하기'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            가족과 함께 역할을 바꾸어 경험한 생생한 이야기와 사진을 남겨주세요.
+            틀 없이 자유롭게 우리 가족이 역할을 어떻게 바꾸어 실천했는지 적어주세요.
           </p>
         </div>
 
@@ -164,52 +151,65 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 flex-1 flex flex-col">
-        {/* 1. Role Swap Category & Detail */}
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-slate-500 ml-1">
-            1. 역할 선택 및 구체적인 활동 <span className="text-rose-500">*</span>
-          </label>
-          
-          <select
-            value={isCustomCategory ? '직접 입력 (우리 가족만의 특별한 역할 바꾸기)' : roleCategory}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val.startsWith('직접 입력')) {
-                setIsCustomCategory(true);
-              } else {
-                setIsCustomCategory(false);
-                setRoleCategory(val);
-              }
-            }}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white transition-all outline-none font-bold text-slate-800"
-          >
-            {PRESET_ROLE_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+      <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col">
+        {/* 1. Free-form Role Swap Section */}
+        <div className="space-y-3 p-4 sm:p-5 bg-blue-50/40 rounded-2xl border-2 border-blue-100">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs sm:text-sm font-black text-slate-800">
+              1. 우리 가족의 역할 바꾸기 내용 (자유 작성) <span className="text-rose-500">*</span>
+            </label>
+            <span className="text-[11px] text-blue-600 font-bold bg-white px-2.5 py-0.5 rounded-full border border-blue-200">
+              자유 서술형
+            </span>
+          </div>
 
-          {isCustomCategory && (
+          <div>
+            <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
+              바꾼 역할 한 줄 요약
+            </label>
             <input
               type="text"
-              placeholder="바꾼 역할을 구체적으로 적어주세요 (예: 할머니 ↔ 손녀 화분 물주기 및 시장보기)"
-              value={customCategoryText}
-              onChange={(e) => setCustomCategoryText(e.target.value)}
-              required={isCustomCategory}
-              className="w-full bg-slate-50 border-2 border-amber-300 rounded-xl px-4 py-3 text-sm focus:border-[#4D96FF] focus:bg-white transition-all outline-none font-bold text-slate-800"
+              placeholder="예: 아빠 ↔ 딸 (저녁 요리와 빨래 개기 교대), 엄마 휴식 &amp; 아빠와 아들의 대청소"
+              value={roleTitle}
+              onChange={(e) => setRoleTitle(e.target.value)}
+              required
+              className="w-full bg-white border-2 border-blue-200 rounded-xl px-4 py-3 text-sm focus:border-[#4D96FF] focus:ring-2 focus:ring-blue-100 transition-all outline-none font-bold text-slate-800"
             />
-          )}
+          </div>
 
-          <textarea
-            rows={2}
-            placeholder="어떤 활동을 구체적으로 바꾸어 수행했는지 적어주세요 (예: 평소 아빠가 하시던 분리수거를 딸 민서가 하고, 민서가 하던 빨래 개기를 아빠가 맡아서 실천했습니다.)"
-            value={roleDetail}
-            onChange={(e) => setRoleDetail(e.target.value)}
-            required
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-[#4D96FF] focus:bg-white transition-all outline-none leading-relaxed text-slate-800 font-medium"
-          />
+          {/* Quick Idea Chips */}
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
+              <Lightbulb className="w-3 h-3 text-amber-500" />
+              <span>참고 예시 (터치 시 자동 입력)</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {ROLE_IDEAS.map((idea, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setRoleTitle(idea)}
+                  className="text-[11px] px-2.5 py-1 bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 rounded-lg border border-slate-200 hover:border-blue-300 font-medium transition-colors"
+                >
+                  {idea}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
+              구체적으로 어떻게 바꾸어 실천했나요?
+            </label>
+            <textarea
+              rows={3}
+              placeholder="가족 구성원들이 어떻게 역할을 바꾸어 활동했는지 자유롭게 적어주세요. (예: 평소 아빠가 하시던 분리수거와 설거지를 딸 민서가 직접 하고, 민서가 하던 빨래 개기를 아빠가 맡아서 함께 집안일을 나누었습니다.)"
+              value={roleDetail}
+              onChange={(e) => setRoleDetail(e.target.value)}
+              required
+              className="w-full bg-white border-2 border-blue-200 rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-[#4D96FF] focus:ring-2 focus:ring-blue-100 transition-all outline-none leading-relaxed text-slate-800 font-medium"
+            />
+          </div>
         </div>
 
         {/* 2. Photo Upload */}
@@ -385,7 +385,9 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
               <>
                 <AlertCircle className="w-5 h-5 text-slate-400" />
                 <span>
-                  {!isPhotosValid
+                  {!isRoleValid
+                    ? '바꾼 역할 내용을 입력해 주세요'
+                    : !isPhotosValid
                     ? '사진 1장 이상 등록 필요'
                     : !isLengthValid
                     ? `활동 소감 100자 이상 작성 필요 (${100 - charCount}자 남음)`

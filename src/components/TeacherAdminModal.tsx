@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Lock, Search, Download, Eye, CheckCircle, ShieldAlert, Sparkles, Filter, Users, School } from 'lucide-react';
-import { MissionSubmission } from '../types';
+import { MissionSubmission, formatGradeText, formatStudentFullTitle } from '../types';
 
 interface TeacherAdminModalProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [selectedGrade, setSelectedGrade] = useState<number | 'all'>('all');
+  const [selectedGrade, setSelectedGrade] = useState<string | number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [inspectSubmission, setInspectSubmission] = useState<MissionSubmission | null>(null);
 
@@ -33,18 +33,18 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
   };
 
   const filtered = submissions.filter((sub) => {
-    const matchGrade = selectedGrade === 'all' || sub.grade === selectedGrade;
+    const matchGrade = selectedGrade === 'all' || String(sub.grade) === String(selectedGrade);
     const matchSearch =
       sub.studentName.includes(searchQuery.trim()) ||
-      `${sub.grade}학년 ${sub.classNum}반`.includes(searchQuery.trim()) ||
+      `${sub.grade} ${sub.classNum}반`.includes(searchQuery.trim()) ||
       sub.roleSwapCategory.includes(searchQuery.trim());
     return matchGrade && matchSearch;
   });
 
   const exportCSV = () => {
-    const headers = ['학년', '반', '번호', '학생이름', '바꾼역할구분', '세부내용', '소감문', '사진개수', '제출일시'];
+    const headers = ['학년/구분', '반', '번호', '학생이름', '바꾼역할요약', '세부실천내용', '소감문', '사진개수', '제출일시'];
     const rows = submissions.map((s) => [
-      s.grade,
+      formatGradeText(s.grade),
       s.classNum,
       s.studentNum,
       s.studentName,
@@ -175,8 +175,18 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
                 >
                   전체 ({submissions.length})
                 </button>
+                <button
+                  onClick={() => setSelectedGrade('유치원')}
+                  className={`text-xs px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${
+                    selectedGrade === '유치원'
+                      ? 'bg-amber-500 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  유치원 ({submissions.filter((s) => String(s.grade) === '유치원').length})
+                </button>
                 {[1, 2, 3, 4, 5, 6].map((g) => {
-                  const count = submissions.filter((s) => s.grade === g).length;
+                  const count = submissions.filter((s) => String(s.grade) === String(g)).length;
                   return (
                     <button
                       key={g}
@@ -232,7 +242,7 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
                       filtered.map((sub) => (
                         <tr key={sub.id} className="hover:bg-amber-50/40 transition-colors">
                           <td className="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap">
-                            {sub.grade} - {sub.classNum} ({sub.studentNum}번)
+                            {formatGradeText(sub.grade)} {sub.classNum}반 ({sub.studentNum}번)
                           </td>
                           <td className="px-4 py-3 font-bold text-slate-900 whitespace-nowrap">
                             {sub.studentName}
@@ -301,7 +311,7 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
               <div>
                 <span className="text-xs font-bold text-amber-600">학생 제출물 상세 검토</span>
                 <h4 className="text-lg font-bold text-slate-800">
-                  {inspectSubmission.grade}학년 {inspectSubmission.classNum}반 {inspectSubmission.studentNum}번 {inspectSubmission.studentName} 학생
+                  {formatStudentFullTitle(inspectSubmission.grade, inspectSubmission.classNum, inspectSubmission.studentNum, inspectSubmission.studentName)}
                 </h4>
               </div>
               <button
