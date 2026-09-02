@@ -172,7 +172,7 @@ export default function App() {
                 </li>
                 <li className="flex items-start space-x-3">
                   <span className="bg-orange-100 text-orange-600 rounded-full p-1 text-xs font-bold shrink-0">✓</span>
-                  <span className="text-xs sm:text-sm font-bold text-slate-700">솔직한 소감문 100자 이상 작성</span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-700">솔직한 소감문 작성 (초등 100자 / 유치원 10자 이상)</span>
                 </li>
               </ul>
             </div>

@@ -60,6 +60,7 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
     submission.studentNum
   );
 
+  const isKindergarten = String(submission.grade) === '유치원' || String(submission.grade) === '0';
   const gradeDisplay = formatGradeText(submission.grade);
 
   return (
@@ -233,10 +234,10 @@ export const SubmissionView: React.FC<SubmissionViewProps> = ({
           <div className="space-y-1.5">
             <div className="flex justify-between items-center ml-1">
               <span className="text-xs font-bold text-slate-500">
-                3. 가족 실천 소감문 ({submission.reflections.length}자)
+                3. {isKindergarten ? '아이/가족 실천 소감' : '가족 실천 소감문'} ({submission.reflections.length}자)
               </span>
               <span className="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                100자 이상 작성 완료 ✓
+                {isKindergarten ? '🐣 유치원 소감 작성 완료 ✓' : '100자 이상 작성 완료 ✓'}
               </span>
             </div>
 

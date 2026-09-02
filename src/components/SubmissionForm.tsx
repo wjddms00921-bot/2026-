@@ -10,12 +10,52 @@ interface SubmissionFormProps {
   onCancel?: () => void;
 }
 
-const ROLE_IDEAS = [
+const ROLE_IDEAS_ELEMENTARY = [
   '아빠 ↔ 딸 (저녁 요리 & 빨래 개기)',
   '엄마 ↔ 아들 (분리수거 & 욕실 청소)',
   '부모님 ↔ 자녀 (집안일 및 스케줄 관리)',
   '형제 ↔ 자매 (방 청소 및 정리 정돈)',
   '할머니/할아버지 ↔ 손자/손녀 (식탁 닦기 & 화분 돌보기)'
+];
+
+const KINDERGARTEN_PRESETS = [
+  {
+    icon: '🧸',
+    title: '장난감 스스로 정리하기',
+    detail: '평소 부모님이 치워주시던 장난감 바구니를 아이가 스스로 제자리에 정리했습니다.',
+    reflection: '아이가 스스로 장난감을 정리하는 모습을 보니 정말 대견하고 뿌듯했습니다.'
+  },
+  {
+    icon: '🥣',
+    title: '밥상에 수저 놓기 & 식사 돕기',
+    detail: '식사 전 가족 수저를 놓고, 식사 후 자기 그릇을 싱크대에 가져다 놓았습니다.',
+    reflection: '밥상 차리기를 도우며 부모님의 고마움을 알고 앞으로 매일 돕겠다고 약속했어요.'
+  },
+  {
+    icon: '🧦',
+    title: '양말 짝 맞추기 & 신발 정리',
+    detail: '빨래 개기를 도우며 양말 짝을 맞추고, 현관 신발을 가지런히 정리했습니다.',
+    reflection: '작은 일이지만 함께 도우니 가족 모두 기분 좋고 뜻깊은 시간이었습니다.'
+  },
+  {
+    icon: '🧹',
+    title: '바닥 쓸기 & 쓰레기 버리기',
+    detail: '작은 빗자루로 바닥을 쓸고, 쓰레기를 쓰레기통에 직접 쏙 버렸습니다.',
+    reflection: '아이가 직접 청소를 해보면서 집안을 깨끗이 아끼고 쓰기로 약속했습니다.'
+  },
+  {
+    icon: '❤️',
+    title: '부모님 안마 & 간단한 심부름',
+    detail: '일하고 오신 부모님 어깨를 주물러 드리고 물을 떠다 드리는 심부름을 했습니다.',
+    reflection: '서로 안아주고 안마해주며 가족의 따뜻한 사랑을 듬뿍 느꼈습니다.'
+  }
+];
+
+const KINDERGARTEN_REFLECTIONS = [
+  '아이가 스스로 정리하는 모습을 보니 정말 대견하고 뿌듯했습니다.',
+  '엄마·아빠의 고마움을 알고 앞으로 매일 돕겠다고 약속했어요.',
+  '작은 일이지만 온 가족이 함께 참여하여 즐겁고 뜻깊은 시간이었습니다.',
+  '아이가 직접 역할을 해보며 가족의 소중함과 사랑을 배웠습니다.'
 ];
 
 export const SubmissionForm: React.FC<SubmissionFormProps> = ({
@@ -24,6 +64,9 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
+  const isKindergarten = String(currentUser.grade) === '유치원' || String(currentUser.grade) === '0';
+  const minCharCount = isKindergarten ? 10 : 100;
+
   const [roleTitle, setRoleTitle] = useState(
     existingSubmission?.roleSwapCategory || ''
   );
@@ -36,10 +79,19 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const charCount = reflections.length;
-  const isLengthValid = charCount >= 100;
+  const isLengthValid = charCount >= minCharCount;
   const isPhotosValid = photos.length >= 1;
   const isRoleValid = roleTitle.trim().length > 0 && roleDetail.trim().length > 0;
   const isFormValid = isLengthValid && isPhotosValid && isRoleValid;
+
+  // Select Kindergarten Preset (fills title, detail and optionally reflection)
+  const handleSelectKindergartenPreset = (preset: typeof KINDERGARTEN_PRESETS[0]) => {
+    setRoleTitle(preset.title);
+    setRoleDetail(preset.detail);
+    if (!reflections.trim()) {
+      setReflections(preset.reflection);
+    }
+  };
 
   // Handle Photo files
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,21 +176,31 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
     onSubmit(pendingSubmission);
   };
 
-  const progressPercent = Math.min(100, Math.round((charCount / 100) * 100));
+  const progressPercent = Math.min(100, Math.round((charCount / minCharCount) * 100));
 
   return (
     <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-xl border-4 border-[#4D96FF] relative flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
         <div>
-          <div className="bg-[#4D96FF] text-white w-fit px-3.5 py-1 rounded-full text-xs font-bold mb-2 shadow-xs">
-            {existingSubmission ? '미션 수정' : '미션 참여하기'}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="bg-[#4D96FF] text-white px-3.5 py-1 rounded-full text-xs font-bold shadow-xs">
+              {existingSubmission ? '미션 수정' : '미션 참여하기'}
+            </span>
+            {isKindergarten && (
+              <span className="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full text-xs font-black flex items-center gap-1">
+                <span>🐣</span>
+                <span>유치원 간편 모드</span>
+              </span>
+            )}
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900">
             {existingSubmission ? '✏️ 미션 실천 내용 수정하기' : '📝 미션 실천 내용 작성하기'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            틀 없이 자유롭게 우리 가족이 역할을 어떻게 바꾸어 실천했는지 적어주세요.
+            {isKindergarten
+              ? '아이와 함께 바꾼 역할을 사진과 함께 짧고 편안하게 기록해 주세요.'
+              : '틀 없이 자유롭게 우리 가족이 역할을 어떻게 바꾸어 실천했는지 적어주세요.'}
           </p>
         </div>
 
@@ -153,6 +215,23 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
           </button>
         )}
       </div>
+
+      {/* 🐣 Kindergarten Friendly Banner */}
+      {isKindergarten && (
+        <div className="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl mb-4 flex items-start gap-3 shadow-xs">
+          <div className="w-9 h-9 rounded-xl bg-emerald-200 text-emerald-900 flex items-center justify-center text-xl shrink-0">
+            🐣
+          </div>
+          <div className="space-y-0.5 text-xs text-emerald-950 font-medium">
+            <span className="font-black text-emerald-900 block text-xs sm:text-sm">
+              유치원 맞춤 간편 작성 모드
+            </span>
+            <p className="text-emerald-800 leading-relaxed">
+              아래의 <strong>추천 예시 버튼을 터치</strong>하시면 활동 내용과 소감문이 손쉽게 자동 입력됩니다! (소감문은 10자 이상의 짧은 한 줄이어도 정상 접수됩니다)
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 📢 BIG PROMINENT NOTICE BANNER */}
       <div className="p-4 sm:p-5 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-300 text-slate-950 rounded-2xl shadow-md border-2 border-amber-400 flex items-start gap-3.5 mb-5">
@@ -180,12 +259,60 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
         <div className="space-y-3 p-4 sm:p-5 bg-blue-50/40 rounded-2xl border-2 border-blue-100">
           <div className="flex items-center justify-between">
             <label className="block text-xs sm:text-sm font-black text-slate-800">
-              1. 우리 가족의 역할 바꾸기 내용 (자유 작성) <span className="text-rose-500">*</span>
+              1. {isKindergarten ? '아이와 함께한 역할 바꾸기' : '우리 가족의 역할 바꾸기 내용'} <span className="text-rose-500">*</span>
             </label>
             <span className="text-[11px] text-blue-600 font-bold bg-white px-2.5 py-0.5 rounded-full border border-blue-200">
-              자유 서술형
+              {isKindergarten ? '터치 시 자동 완성' : '자유 서술형'}
             </span>
           </div>
+
+          {/* Kindergarten 1-Click Auto Fill Presets */}
+          {isKindergarten && (
+            <div className="space-y-1.5 p-3 bg-white rounded-xl border border-blue-200">
+              <div className="flex items-center gap-1 text-xs font-black text-blue-900">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>추천 활동 예시 (터치 시 내용이 바로 입력됩니다)</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                {KINDERGARTEN_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectKindergartenPreset(preset)}
+                    className="text-left text-xs p-2.5 bg-blue-50/60 hover:bg-blue-100/80 text-slate-800 rounded-xl border border-blue-200 hover:border-blue-400 font-bold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                  >
+                    <span className="text-base">{preset.icon}</span>
+                    <div className="truncate">
+                      <span className="text-blue-950 font-black block truncate">{preset.title}</span>
+                      <span className="text-[10px] text-slate-500 font-normal truncate block">{preset.detail}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Elementary Quick Idea Chips */}
+          {!isKindergarten && (
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
+                <Lightbulb className="w-3 h-3 text-amber-500" />
+                <span>참고 예시 (터치 시 자동 입력)</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {ROLE_IDEAS_ELEMENTARY.map((idea, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setRoleTitle(idea)}
+                    className="text-[11px] px-2.5 py-1 bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-lg border border-slate-200 hover:border-blue-300 font-medium transition-colors cursor-pointer"
+                  >
+                    {idea}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
@@ -193,7 +320,11 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
             </label>
             <input
               type="text"
-              placeholder="예: 아빠 ↔ 딸 (저녁 요리와 빨래 개기 교대), 엄마 휴식 &amp; 아빠와 아들의 대청소"
+              placeholder={
+                isKindergarten
+                  ? '예: 아이가 장난감을 스스로 치우고 부모님을 도와드렸어요'
+                  : '예: 아빠 ↔ 딸 (저녁 요리와 빨래 개기 교대), 엄마 휴식 & 아빠와 아들의 대청소'
+              }
               value={roleTitle}
               onChange={(e) => setRoleTitle(e.target.value)}
               required
@@ -201,33 +332,17 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
             />
           </div>
 
-          {/* Quick Idea Chips */}
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
-              <Lightbulb className="w-3 h-3 text-amber-500" />
-              <span>참고 예시 (터치 시 자동 입력)</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {ROLE_IDEAS.map((idea, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setRoleTitle(idea)}
-                  className="text-[11px] px-2.5 py-1 bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 rounded-lg border border-slate-200 hover:border-blue-300 font-medium transition-colors cursor-pointer"
-                >
-                  {idea}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div>
             <label className="block text-xs font-bold text-slate-500 mb-1 ml-1">
-              구체적으로 어떻게 바꾸어 실천했나요?
+              {isKindergarten ? '어떻게 실천했나요? (직접 수정하거나 추가하셔도 좋습니다)' : '구체적으로 어떻게 바꾸어 실천했나요?'}
             </label>
             <textarea
-              rows={3}
-              placeholder="가족 구성원들이 어떻게 역할을 바꾸어 활동했는지 자유롭게 적어주세요. (예: 평소 아빠가 하시던 분리수거와 설거지를 딸 민서가 직접 하고, 민서가 하던 빨래 개기를 아빠가 맡아서 함께 집안일을 나누었습니다.)"
+              rows={isKindergarten ? 2 : 3}
+              placeholder={
+                isKindergarten
+                  ? '예: 평소 부모님이 치워주시던 장난감 바구니를 아이가 직접 정리하고, 식사 후 자기 그릇을 싱크대에 가져다 놓았습니다.'
+                  : '가족 구성원들이 어떻게 역할을 바꾸어 활동했는지 자유롭게 적어주세요. (예: 평소 아빠가 하시던 분리수거와 설거지를 딸 민서가 직접 하고, 민서가 하던 빨래 개기를 아빠가 맡아서 함께 집안일을 나누었습니다.)'
+              }
               value={roleDetail}
               onChange={(e) => setRoleDetail(e.target.value)}
               required
@@ -326,7 +441,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
         <div className="space-y-2 flex-1 flex flex-col">
           <div className="flex justify-between items-center ml-1">
             <label className="block text-xs font-bold text-slate-500">
-              3. 활동 소감문 (100자 이상) <span className="text-rose-500">*</span>
+              3. {isKindergarten ? '가족/아이 실천 소감 (10자 이상)' : '활동 소감문 (100자 이상)'} <span className="text-rose-500">*</span>
             </label>
             <span
               className={`text-xs font-black px-3 py-1 rounded-full transition-all ${
@@ -335,13 +450,39 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
                   : 'bg-red-50 text-red-400 border border-red-200'
               }`}
             >
-              {charCount} / 100자
+              {charCount} / {minCharCount}자
             </span>
           </div>
 
+          {/* Kindergarten Quick Reflection Chips */}
+          {isKindergarten && (
+            <div className="space-y-1.5 p-3 bg-amber-50/70 rounded-xl border border-amber-200">
+              <div className="flex items-center gap-1 text-[11px] font-black text-amber-900">
+                <Heart className="w-3.5 h-3.5 text-rose-500" />
+                <span>추천 소감문 (터치 시 바로 입력되며, 수정도 가능합니다)</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {KINDERGARTEN_REFLECTIONS.map((refText, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setReflections(refText)}
+                    className="text-[11px] px-2.5 py-1.5 bg-white hover:bg-amber-100 text-amber-950 rounded-lg border border-amber-300 font-bold transition-all text-left cursor-pointer shadow-2xs"
+                  >
+                    "{refText}"
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <textarea
-            rows={5}
-            placeholder="평소 느끼지 못했던 가족의 수고로움을 통해 느낀 점과 앞으로 함께 실천할 다짐을 솔직하게 100자 이상 적어주세요."
+            rows={isKindergarten ? 3 : 5}
+            placeholder={
+              isKindergarten
+                ? '아이와 함께 활동하며 느낀 점이나 아이가 한 말을 짧게 적어주세요. (위 추천 문장을 누르셔도 바로 입력됩니다)'
+                : '평소 느끼지 못했던 가족의 수고로움을 통해 느낀 점과 앞으로 함께 실천할 다짐을 솔직하게 100자 이상 적어주세요.'
+            }
             value={reflections}
             onChange={(e) => setReflections(e.target.value)}
             required
@@ -355,7 +496,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
                 className={`h-full transition-all duration-300 ${
                   isLengthValid
                     ? 'bg-[#6BCB77]'
-                    : charCount >= 50
+                    : charCount >= (minCharCount / 2)
                     ? 'bg-[#FFD93D]'
                     : 'bg-rose-400'
                 }`}
@@ -370,8 +511,8 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
                 }`}
               >
                 {isLengthValid
-                  ? '🎉 100자 이상 작성되었습니다! 정성 가득한 소감입니다.'
-                  : `100자 이상 작성해야 제출 버튼이 활성화됩니다. (${100 - charCount}자 남음)`}
+                  ? (isKindergarten ? '🎉 소감이 정성껏 작성되었습니다! (제출 가능)' : '🎉 100자 이상 작성되었습니다! 정성 가득한 소감입니다.')
+                  : `${minCharCount}자 이상 작성해야 제출 버튼이 활성화됩니다. (${minCharCount - charCount}자 남음)`}
               </span>
               <span className="text-slate-400 tabular-nums font-mono font-bold">
                 {charCount}자
@@ -414,7 +555,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({
                     : !isPhotosValid
                     ? '사진 1장 이상 등록 필요'
                     : !isLengthValid
-                    ? `활동 소감 100자 이상 작성 필요 (${100 - charCount}자 남음)`
+                    ? `활동 소감 ${minCharCount}자 이상 작성 필요 (${minCharCount - charCount}자 남음)`
                     : '필수 항목을 모두 입력해 주세요'}
                 </span>
               </>

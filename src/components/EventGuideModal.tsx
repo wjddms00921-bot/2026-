@@ -88,8 +88,8 @@ export const EventGuideModal: React.FC<EventGuideModalProps> = ({ isOpen, onClos
               <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
                 <div>
-                  <strong className="text-slate-800 block text-xs sm:text-sm">가족 소감문 100자 이상 작성</strong>
-                  <span className="text-slate-600 text-xs">직접 역할을 바꾸어 보고 느낀 점, 감사한 마음을 솔직하게 100자 이상 적어주세요.</span>
+                  <strong className="text-slate-800 block text-xs sm:text-sm">가족 소감문 작성 (초등 100자 / 유치원 10자 이상)</strong>
+                  <span className="text-slate-600 text-xs">직접 역할을 바꾸어 보고 느낀 점을 작성합니다. (유치원은 짧은 한 줄 10자 이상 작성도 가능합니다)</span>
                 </div>
               </div>
 

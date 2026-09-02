@@ -153,6 +153,12 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
     return matchGrade && matchSearch;
   });
 
+  const compliantCount = submissions.filter((s) => {
+    const isKinder = String(s.grade) === '유치원' || String(s.grade) === '0';
+    return isKinder ? s.reflections.length >= 10 : s.reflections.length >= 100;
+  }).length;
+  const complianceRate = submissions.length > 0 ? Math.round((compliantCount / submissions.length) * 100) : 0;
+
   const exportCSV = () => {
     const headers = ['학년/구분', '학생이름', '바꾼역할요약', '세부실천내용', '소감문', '사진개수', '제출일시'];
     const rows = submissions.map((s) => [
@@ -359,9 +365,9 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
                 <div className="text-2xl font-black text-amber-900 mt-0.5">{submissions.length}가정</div>
               </div>
               <div className="bg-emerald-50 border border-emerald-200/80 rounded-2xl p-3.5">
-                <span className="text-xs font-semibold text-emerald-700">소감문 충족률</span>
+                <span className="text-xs font-semibold text-emerald-700">소감문 기준 충족률</span>
                 <div className="text-2xl font-black text-emerald-900 mt-0.5">
-                  {submissions.length > 0 ? '100% (100자+)' : '0%'}
+                  {submissions.length > 0 ? `${complianceRate}%` : '0%'}
                 </div>
               </div>
               <div className="bg-sky-50 border border-sky-200/80 rounded-2xl p-3.5">
@@ -477,6 +483,7 @@ export const TeacherAdminModal: React.FC<TeacherAdminModalProps> = ({
                           <td className="px-4 py-3 whitespace-nowrap">
                             <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold text-xs border border-emerald-200">
                               {sub.reflections.length}자
+                              {(String(sub.grade) === '유치원' || String(sub.grade) === '0') && ' (유치원)'}
                             </span>
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap font-medium text-slate-600">
